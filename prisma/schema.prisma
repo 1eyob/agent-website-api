@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Agent {
+  id           String        @id @default(uuid())
+  subdomain    String        @unique
+  fullName     String
+  profilePhoto String?
+  bio          String?
+  phone        String?
+  email        String        @unique
+  officeHours  String        @default("Mon–Fri 9am–5pm")
+  logo         String?
+  heroImage    String?
+  heroVideo    String?
+  heroTitle    String?
+  heroSubtitle String?
+  instagramUrl String?
+  blogUrl      String?
+  title        String?
+  communities  Community[]
+  testimonials Testimonial[]
+  properties   Property[]
+
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Community {
+  id          String     @id @default(uuid())
+  name        String
+  photo       String
+  description String
+  highlights  String[]
+  homeStyles  String[]
+  link        String
+  agentId     String
+  agent       Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  Property    Property[]
+}
+
+model Testimonial {
+  id      String @id @default(uuid())
+  name    String
+  content String
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+}
+
+model Property {
+  id            String         @id @default(uuid())
+  type          PropertyType
+  title         String
+  address       String
+  price         Int
+  status        PropertyStatus
+  isFeatured    Boolean        @default(false)
+  bedrooms      Int
+  bathrooms     Int
+  description   String
+  squareFootage Int
+  yearBuilt     Int
+  lotSize       Int
+  garage        Int
+  features      String[]
+  photos        String[]
+  videoUrl      String?
+  link          String
+  agentId       String
+  communityId   String
+  agent         Agent          @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  community     Community      @relation(fields: [communityId], references: [id], onDelete: Cascade)
+}
+
+enum PropertyType {
+  SINGLE_FAMILY
+  CONDO
+  TOWNHOUSE
+  LAND
+}
+
+enum PropertyStatus {
+  ACTIVE
+  SOLD
+  PENDING
+  NEW
+  REDUCED
+  OFF_MARKET
+  EXCLUSIVE
+}
+
+model OTP {
+  id        String   @id @default(uuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
