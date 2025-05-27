@@ -63,7 +63,26 @@ async function main() {
     },
   });
 
-  console.log({ agent });
+  // Generate a unique subdomain for Eric
+  const ericBaseSubdomain = "ericengert";
+  const ericUniqueSubdomain = await generateUniqueSubdomain(ericBaseSubdomain);
+
+  // Create Eric's agent profile
+  const ericAgent = await prisma.agent.upsert({
+    where: { email: "eric@luxvt.com" },
+    update: {
+      subdomain: ericUniqueSubdomain,
+    },
+    create: {
+      email: "eric@luxvt.com",
+      fullName: "Eric Engert",
+      subdomain: ericUniqueSubdomain,
+      phone: "+1345678896",
+      bio: "I am a legal luxvt agent",
+    },
+  });
+
+  console.log({ agent, ericAgent });
 }
 
 main()
