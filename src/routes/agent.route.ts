@@ -6,6 +6,7 @@ import {
   createTestimonial,
   updateTestimonial,
   getAgentTestimonials,
+  getAgentBySubdomain,
 } from "../controller/agent.controller";
 import { authenticateAgent } from "../middleware/auth.middleware";
 import {
@@ -15,7 +16,10 @@ import {
 
 const router = express.Router();
 
-// All routes are protected
+// Public routes
+router.get("/", getAgentBySubdomain as RequestHandler);
+
+// Protected routes
 router.use(authenticateAgent as RequestHandler);
 
 // Protected routes

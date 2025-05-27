@@ -21,7 +21,7 @@ model Agent {
   bio          String?
   phone        String?
   email        String        @unique
-  officeHours  String        @default("Mon–Fri 9am–5pm")
+  officeHours  Json?
   logo         String?
   heroImage    String?
   heroVideo    String?
@@ -61,28 +61,28 @@ model Testimonial {
 }
 
 model Property {
-  id            String         @id @default(uuid())
-  type          PropertyType
+  id            String          @id @default(uuid())
+  type          PropertyType?
   title         String
-  address       String
+  address       String?
   price         Int
-  status        PropertyStatus
-  isFeatured    Boolean        @default(false)
-  bedrooms      Int
-  bathrooms     Int
+  status        PropertyStatus?
+  isFeatured    Boolean         @default(false)
+  bedrooms      Int?
+  bathrooms     Int?
   description   String
-  squareFootage Int
-  yearBuilt     Int
-  lotSize       Int
-  garage        Int
+  squareFootage Int?
+  yearBuilt     Int?
+  lotSize       Int?
+  garage        Int?
   features      String[]
   photos        String[]
   videoUrl      String?
   link          String
   agentId       String
-  communityId   String
-  agent         Agent          @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  community     Community      @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  communityId   String?
+  agent         Agent           @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  community     Community?      @relation(fields: [communityId], references: [id], onDelete: Cascade)
 }
 
 enum PropertyType {

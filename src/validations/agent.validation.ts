@@ -20,7 +20,43 @@ export const createAgentSchema = z.object({
     .regex(/^\+?[1-9]\d{1,14}$/)
     .default("+1234567890"),
   email: z.string().email(),
-  officeHours: z.string().default("Mon–Fri 9am–5pm"),
+  officeHours: z.object({
+    monday: z.object({
+      start: z.string(),
+      end: z.string(),
+      closed: z.boolean(),
+    }),
+    tuesday: z.object({
+      start: z.string(),
+      end: z.string(),
+      closed: z.boolean(),
+    }),
+    wednesday: z.object({
+      start: z.string(),
+      end: z.string(),
+      closed: z.boolean(),
+    }),
+    thursday: z.object({
+      start: z.string(),
+      end: z.string(),
+      closed: z.boolean(),
+    }),
+    friday: z.object({
+      start: z.string(),
+      end: z.string(),
+      closed: z.boolean(),
+    }),
+    saturday: z.object({
+      start: z.string(),
+      end: z.string(),
+      closed: z.boolean(),
+    }),
+    sunday: z.object({
+      start: z.string(),
+      end: z.string(),
+      closed: z.boolean(),
+    }),
+  }),
   logo: z.string().optional(),
   heroImage: z.string().optional(),
   heroVideo: z.string().optional(),

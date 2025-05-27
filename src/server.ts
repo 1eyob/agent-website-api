@@ -11,6 +11,7 @@ import agentRouter from "./routes/agent.route";
 import communityRouter from "./routes/community.route";
 import propertyRouter from "./routes/property.route";
 import testimonialRouter from "./routes/testimonial.route";
+import instagramRouter from "./routes/instagram.route";
 const app = express();
 const server = http.createServer(app);
 
@@ -36,6 +37,7 @@ app.use(`${apiVersion}/agent`, agentRouter);
 app.use(`${apiVersion}/community`, communityRouter);
 app.use(`${apiVersion}/property`, propertyRouter);
 app.use(`${apiVersion}/testimonial`, testimonialRouter);
+app.use(`${apiVersion}/instagram`, instagramRouter);
 const PORT = process.env.PORT || 5001;
 
 server.listen(PORT, () => {

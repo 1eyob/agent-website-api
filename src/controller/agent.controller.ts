@@ -108,8 +108,9 @@ export const createAgent = async (req: Request, res: Response) => {
 
 export const getAgent = async (req: Request, res: Response) => {
   try {
+    console.log("get agent");
     const agentId = (req as any).agent?.id;
-    console.log(agentId);
+
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
       include: {
@@ -166,6 +167,22 @@ export const updateAgent = async (req: Request, res: Response) => {
 
     // Validate update data
     const validatedData = updateAgentSchema.parse(updateData);
+
+    // Check for subdomain uniqueness if subdomain is being updated
+    if (validatedData.subdomain) {
+      const existingAgent = await prisma.agent.findFirst({
+        where: {
+          subdomain: validatedData.subdomain,
+          id: { not: agentId }, // Exclude current agent
+        },
+      });
+
+      if (existingAgent) {
+        return res.status(400).json({
+          error: "Subdomain is already taken by another agent",
+        });
+      }
+    }
 
     // Update agent
     const updatedAgent = await prisma.agent.update({
@@ -260,6 +277,104 @@ export const getAgentTestimonials = async (req: Request, res: Response) => {
     res.status(200).json({ testimonials });
   } catch (error: any) {
     console.error("Get testimonials error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getAgentBySubdomain = async (req: Request, res: Response) => {
+  try {
+    const { subdomain } = req.query;
+
+    if (!subdomain || typeof subdomain !== "string") {
+      return res.status(400).json({ error: "Subdomain is required" });
+    }
+
+    console.log("Fetching agent with subdomain:", subdomain);
+
+    const agent = await prisma.agent.findUnique({
+      where: { subdomain },
+      include: {
+        communities: {
+          select: {
+            id: true,
+            name: true,
+            photo: true,
+            description: true,
+            highlights: true,
+            homeStyles: true,
+            link: true,
+          },
+        },
+        testimonials: {
+          select: {
+            id: true,
+            name: true,
+            content: true,
+          },
+        },
+        properties: {
+          select: {
+            id: true,
+            type: true,
+            title: true,
+            address: true,
+            price: true,
+            status: true,
+            isFeatured: true,
+            bedrooms: true,
+            bathrooms: true,
+            description: true,
+            squareFootage: true,
+            yearBuilt: true,
+            lotSize: true,
+            garage: true,
+            features: true,
+            photos: true,
+            videoUrl: true,
+            link: true,
+            community: {
+              select: {
+                id: true,
+                name: true,
+                photo: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Filter out unpublished properties
+    const publishedProperties = agent?.properties.filter(
+      (property) => property.status !== "OFF_MARKET"
+    );
+
+    // Return only the necessary public data
+    const publicAgentData = {
+      id: agent?.id,
+      subdomain: agent?.subdomain,
+      fullName: agent?.fullName,
+      profilePhoto: agent?.profilePhoto,
+      bio: agent?.bio,
+      email: agent?.email,
+      phone: agent?.phone,
+      officeHours: agent?.officeHours,
+      logo: agent?.logo,
+      heroImage: agent?.heroImage,
+      heroVideo: agent?.heroVideo,
+      heroTitle: agent?.heroTitle,
+      heroSubtitle: agent?.heroSubtitle,
+      instagramUrl: agent?.instagramUrl,
+      blogUrl: agent?.blogUrl,
+      title: agent?.title,
+      communities: agent?.communities,
+      testimonials: agent?.testimonials,
+      properties: publishedProperties,
+    };
+
+    res.status(200).json({ agent: publicAgentData });
+  } catch (error) {
+    console.error("Get agent by subdomain error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

@@ -6,6 +6,7 @@ import {
   Agent,
 } from "@prisma/client";
 import { z } from "zod";
+import { ParsedQs } from "qs";
 
 const prisma = new PrismaClient();
 
@@ -20,21 +21,29 @@ interface AuthenticatedRequest extends Request {
 
 // Validation schema for property creation
 const createPropertySchema = z.object({
-  type: z.nativeEnum(PropertyType),
+  type: z.nativeEnum(PropertyType).optional(),
   title: z.string().min(1, "Title is required"),
-  address: z.string().min(1, "Address is required"),
+  address: z.string().optional(),
   price: z.number().positive("Price must be positive"),
   status: z.nativeEnum(PropertyStatus),
-  communityId: z.string().min(1, "Community is required"),
+  communityId: z.string().min(1, "Community is required").optional(),
   isFeatured: z.boolean().optional(),
-  bedrooms: z.number().int().positive("Bedrooms must be positive"),
-  bathrooms: z.number().int().positive("Bathrooms must be positive"),
+  bedrooms: z.number().int().positive("Bedrooms must be positive").optional(),
+  bathrooms: z.number().int().positive("Bathrooms must be positive").optional(),
   description: z.string().min(1, "Description is required"),
-  squareFootage: z.number().int().positive("Square footage must be positive"),
-  yearBuilt: z.number().int().positive("Year built must be positive"),
-  lotSize: z.number().int().positive("Lot size must be positive"),
-  garage: z.number().int().min(0, "Garage must be non-negative"),
-  features: z.array(z.string()),
+  squareFootage: z
+    .number()
+    .int()
+    .positive("Square footage must be positive")
+    .optional(),
+  yearBuilt: z
+    .number()
+    .int()
+    .positive("Year built must be positive")
+    .optional(),
+  lotSize: z.number().int().positive("Lot size must be positive").optional(),
+  garage: z.number().int().min(0, "Garage must be non-negative").optional(),
+  features: z.array(z.string()).optional(),
   link: z.string().url("Invalid property link"),
 });
 
@@ -155,7 +164,7 @@ export const updateProperty = async (
   res: Response
 ) => {
   try {
-    const agentId = req.user?.id;
+    const agentId = req.agent?.id;
     const propertyId = req.params.id;
 
     if (!agentId) {
@@ -184,12 +193,15 @@ export const updateProperty = async (
     const files = req.files;
     const updateData: any = { ...validatedData };
 
-    if (files?.photos) {
+    // Handle photos update
+    if (files?.photos && files.photos.length > 0) {
       updateData.photos = files.photos.map((photo) =>
         normalizePath(photo.path)
       );
     }
-    if (files?.video) {
+
+    // Handle video update
+    if (files?.video && files.video.length > 0) {
       updateData.videoUrl = normalizePath(files.video[0].path);
     }
 
@@ -206,6 +218,7 @@ export const updateProperty = async (
             subdomain: true,
           },
         },
+        community: true,
       },
     });
 
@@ -213,7 +226,7 @@ export const updateProperty = async (
       message: "Property updated successfully",
       property: updatedProperty,
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         message: "Validation error",
@@ -346,6 +359,415 @@ export const getPropertyById = async (
     res.status(200).json({ property });
   } catch (error) {
     console.error("Error fetching property:", error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getPropertiesByCommunity = async (req: Request, res: Response) => {
+  try {
+    const { communityId } = req.params;
+    const subdomain = req.query.subdomain as string;
+    console.log("got it,", communityId, subdomain);
+    const {
+      search,
+      type,
+      status,
+      minPrice,
+      maxPrice,
+      bedrooms,
+      bathrooms,
+      minSquareFootage,
+      maxSquareFootage,
+      minYearBuilt,
+      maxYearBuilt,
+      minLotSize,
+      maxLotSize,
+      features,
+      sortBy = "price",
+      sortOrder = "desc",
+      page = "1",
+      limit = "10",
+    } = req.query;
+
+    // Find community by both subdomain and communityId
+    const community = await prisma.community.findFirst({
+      where: {
+        id: communityId,
+        agent: {
+          subdomain: subdomain,
+        },
+      },
+      include: {
+        agent: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            subdomain: true,
+            profilePhoto: true,
+          },
+        },
+      },
+    });
+
+    if (!community) {
+      return res.status(404).json({
+        message:
+          "Community not found or does not belong to the specified agent",
+      });
+    }
+
+    // Build filter object
+    const filter: any = {
+      communityId: community.id,
+    };
+
+    // Add search filter if provided
+    if (search) {
+      filter.OR = [
+        { title: { contains: search as string, mode: "insensitive" } },
+        { description: { contains: search as string, mode: "insensitive" } },
+        { address: { contains: search as string, mode: "insensitive" } },
+      ];
+    }
+
+    // Add other filters
+    if (type) filter.type = type;
+    if (status) filter.status = status;
+
+    // Price range filter
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.gte = parseInt(minPrice as string);
+      if (maxPrice) filter.price.lte = parseInt(maxPrice as string);
+    }
+
+    // Square footage range filter
+    if (minSquareFootage || maxSquareFootage) {
+      filter.squareFootage = {};
+      if (minSquareFootage)
+        filter.squareFootage.gte = parseInt(minSquareFootage as string);
+      if (maxSquareFootage)
+        filter.squareFootage.lte = parseInt(maxSquareFootage as string);
+    }
+
+    // Year built range filter
+    if (minYearBuilt || maxYearBuilt) {
+      filter.yearBuilt = {};
+      if (minYearBuilt) filter.yearBuilt.gte = parseInt(minYearBuilt as string);
+      if (maxYearBuilt) filter.yearBuilt.lte = parseInt(maxYearBuilt as string);
+    }
+
+    // Lot size range filter
+    if (minLotSize || maxLotSize) {
+      filter.lotSize = {};
+      if (minLotSize) filter.lotSize.gte = parseInt(minLotSize as string);
+      if (maxLotSize) filter.lotSize.lte = parseInt(maxLotSize as string);
+    }
+
+    // Features filter (array of features)
+    if (features) {
+      const featureArray =
+        typeof features === "string"
+          ? features.split(",").map((f) => f.trim())
+          : Array.isArray(features)
+          ? features.map((f) => String(f).trim())
+          : [];
+
+      if (featureArray.length > 0) {
+        filter.features = {
+          hasEvery: featureArray,
+        };
+      }
+    }
+
+    if (bedrooms) filter.bedrooms = parseInt(bedrooms as string);
+    if (bathrooms) filter.bathrooms = parseInt(bathrooms as string);
+
+    // Validate sort parameters
+    const validSortFields = [
+      "price",
+      "bedrooms",
+      "bathrooms",
+      "squareFootage",
+      "yearBuilt",
+      "lotSize",
+      "garage",
+    ];
+    const validSortOrders = ["asc", "desc"];
+
+    const finalSortBy = validSortFields.includes(sortBy as string)
+      ? sortBy
+      : "price";
+    const finalSortOrder = validSortOrders.includes(sortOrder as string)
+      ? sortOrder
+      : "desc";
+
+    // Calculate pagination
+    const pageNumber = parseInt(page as string);
+    const limitNumber = parseInt(limit as string);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    // Get total count for pagination
+    const total = await prisma.property.count({ where: filter });
+
+    // Fetch properties with pagination and sorting
+    const properties = await prisma.property.findMany({
+      where: filter,
+      skip,
+      take: limitNumber,
+      orderBy: {
+        [finalSortBy as string]: finalSortOrder,
+      },
+      include: {
+        agent: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            subdomain: true,
+            profilePhoto: true,
+          },
+        },
+        community: {
+          select: {
+            id: true,
+            name: true,
+            photo: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json({
+      properties,
+      community,
+      pagination: {
+        total,
+        page: pageNumber,
+        limit: limitNumber,
+        totalPages: Math.ceil(total / limitNumber),
+      },
+      filters: {
+        search,
+        type,
+        status,
+        minPrice,
+        maxPrice,
+        bedrooms,
+        bathrooms,
+        minSquareFootage,
+        maxSquareFootage,
+        minYearBuilt,
+        maxYearBuilt,
+        minLotSize,
+        maxLotSize,
+        features:
+          typeof features === "string"
+            ? features.split(",").map((f) => f.trim())
+            : Array.isArray(features)
+            ? features.map((f) => String(f).trim())
+            : undefined,
+        sortBy: finalSortBy,
+        sortOrder: finalSortOrder,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching properties by community:", error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getPropertiesByAgent = async (req: Request, res: Response) => {
+  try {
+    const subdomain = req.query.subdomain as string;
+    const {
+      search,
+      type,
+      status,
+      minPrice,
+      maxPrice,
+      bedrooms,
+      bathrooms,
+      minSquareFootage,
+      maxSquareFootage,
+      minYearBuilt,
+      maxYearBuilt,
+      minLotSize,
+      maxLotSize,
+      features,
+      sortBy = "price",
+      sortOrder = "desc",
+      page = "1",
+      limit = "10",
+    } = req.query;
+
+    // Find agent by subdomain
+    const agent = await prisma.agent.findUnique({
+      where: { subdomain },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        subdomain: true,
+        profilePhoto: true,
+      },
+    });
+
+    if (!agent) {
+      return res.status(404).json({ message: "Agent not found" });
+    }
+
+    // Build filter object
+    const filter: any = {
+      agentId: agent.id,
+    };
+
+    // Add search filter if provided
+    if (search) {
+      filter.OR = [
+        { title: { contains: search as string, mode: "insensitive" } },
+        { description: { contains: search as string, mode: "insensitive" } },
+        { address: { contains: search as string, mode: "insensitive" } },
+      ];
+    }
+
+    // Add other filters
+    if (type) filter.type = type;
+    if (status) filter.status = status;
+
+    // Price range filter
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.gte = parseInt(minPrice as string);
+      if (maxPrice) filter.price.lte = parseInt(maxPrice as string);
+    }
+
+    // Square footage range filter
+    if (minSquareFootage || maxSquareFootage) {
+      filter.squareFootage = {};
+      if (minSquareFootage)
+        filter.squareFootage.gte = parseInt(minSquareFootage as string);
+      if (maxSquareFootage)
+        filter.squareFootage.lte = parseInt(maxSquareFootage as string);
+    }
+
+    // Year built range filter
+    if (minYearBuilt || maxYearBuilt) {
+      filter.yearBuilt = {};
+      if (minYearBuilt) filter.yearBuilt.gte = parseInt(minYearBuilt as string);
+      if (maxYearBuilt) filter.yearBuilt.lte = parseInt(maxYearBuilt as string);
+    }
+
+    // Lot size range filter
+    if (minLotSize || maxLotSize) {
+      filter.lotSize = {};
+      if (minLotSize) filter.lotSize.gte = parseInt(minLotSize as string);
+      if (maxLotSize) filter.lotSize.lte = parseInt(maxLotSize as string);
+    }
+
+    // Features filter
+    if (features) {
+      const featureArray =
+        typeof features === "string"
+          ? features.split(",").map((f) => f.trim())
+          : Array.isArray(features)
+          ? features.map((f) => String(f).trim())
+          : [];
+
+      if (featureArray.length > 0) {
+        filter.features = { hasEvery: featureArray };
+      }
+    }
+
+    if (bedrooms) filter.bedrooms = parseInt(bedrooms as string);
+    if (bathrooms) filter.bathrooms = parseInt(bathrooms as string);
+
+    // Validate sort parameters
+    const validSortFields = [
+      "price",
+      "bedrooms",
+      "bathrooms",
+      "squareFootage",
+      "yearBuilt",
+      "lotSize",
+      "garage",
+    ];
+    const validSortOrders = ["asc", "desc"];
+
+    const finalSortBy = validSortFields.includes(sortBy as string)
+      ? sortBy
+      : "price";
+    const finalSortOrder = validSortOrders.includes(sortOrder as string)
+      ? sortOrder
+      : "desc";
+
+    // Calculate pagination
+    const pageNumber = parseInt(page as string);
+    const limitNumber = parseInt(limit as string);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    // Get total count for pagination
+    const total = await prisma.property.count({ where: filter });
+
+    // Fetch properties with pagination and sorting
+    const properties = await prisma.property.findMany({
+      where: filter,
+      skip,
+      take: limitNumber,
+      orderBy: {
+        [finalSortBy as string]: finalSortOrder,
+      },
+      include: {
+        community: {
+          select: {
+            id: true,
+            name: true,
+            photo: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json({
+      properties,
+      agent,
+      pagination: {
+        total,
+        page: pageNumber,
+        limit: limitNumber,
+        totalPages: Math.ceil(total / limitNumber),
+      },
+      filters: {
+        search,
+        type,
+        status,
+        minPrice,
+        maxPrice,
+        bedrooms,
+        bathrooms,
+        minSquareFootage,
+        maxSquareFootage,
+        minYearBuilt,
+        maxYearBuilt,
+        minLotSize,
+        maxLotSize,
+        features:
+          typeof features === "string"
+            ? features.split(",").map((f) => f.trim())
+            : Array.isArray(features)
+            ? features.map((f) => String(f).trim())
+            : undefined,
+        sortBy: finalSortBy,
+        sortOrder: finalSortOrder,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching properties by agent:", error);
     res.status(500).json({
       message: "Internal server error",
     });

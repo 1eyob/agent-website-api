@@ -4,6 +4,8 @@ import {
   updateProperty,
   getProperties,
   getPropertyById,
+  getPropertiesByCommunity,
+  getPropertiesByAgent,
 } from "../controller/property.controller";
 import { authenticateAgent } from "../middleware/auth.middleware";
 import { uploadPropertyFiles } from "../middleware/upload.middleware";
@@ -17,6 +19,10 @@ router.post(
   uploadPropertyFiles,
   createProperty as RequestHandler
 );
+// Get properties by agent ID (public route)
+router.get("/agent", getPropertiesByAgent as RequestHandler);
+// Get all properties with filtering and pagination
+router.get("/", getProperties as RequestHandler);
 
 // Update property
 router.patch(
@@ -26,10 +32,13 @@ router.patch(
   updateProperty as RequestHandler
 );
 
-// Get all properties with filtering and pagination
-router.get("/", getProperties as RequestHandler);
-
 // Get single property by ID
 router.get("/:id", getPropertyById as RequestHandler);
+
+// Get properties by community ID (public route)
+router.get(
+  "/community/:communityId",
+  getPropertiesByCommunity as RequestHandler
+);
 
 export default router;
