@@ -6,6 +6,7 @@ import {
   getPropertyById,
   getPropertiesByCommunity,
   getPropertiesByAgent,
+  deleteProperty,
 } from "../controller/property.controller";
 import { authenticateAgent } from "../middleware/auth.middleware";
 import { uploadPropertyFiles } from "../middleware/upload.middleware";
@@ -39,6 +40,13 @@ router.get("/:id", getPropertyById as RequestHandler);
 router.get(
   "/community/:communityId",
   getPropertiesByCommunity as RequestHandler
+);
+
+// Delete property
+router.delete(
+  "/:id",
+  authenticateAgent as RequestHandler,
+  deleteProperty as RequestHandler
 );
 
 export default router;

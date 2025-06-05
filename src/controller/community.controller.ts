@@ -139,3 +139,35 @@ export const updateCommunity = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const deleteCommunity = async (req: Request, res: Response) => {
+  try {
+    if (!req.agent?.id) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const communityId = req.params.id;
+    const existing = await prisma.community.findUnique({
+      where: { id: communityId },
+    });
+
+    if (!existing) {
+      return res.status(404).json({ error: "Community not found" });
+    }
+
+    if (existing.agentId !== req.agent.id) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    await prisma.community.delete({
+      where: { id: communityId },
+    });
+
+    res.status(200).json({
+      message: "Community deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete community error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

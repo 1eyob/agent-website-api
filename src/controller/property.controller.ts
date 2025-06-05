@@ -773,3 +773,47 @@ export const getPropertiesByAgent = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const deleteProperty = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  try {
+    const agentId = req.agent?.id;
+    const propertyId = req.params.id;
+
+    if (!agentId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Check if property exists and belongs to the agent
+    const existingProperty = await prisma.property.findFirst({
+      where: {
+        id: propertyId,
+        agentId,
+      },
+    });
+
+    if (!existingProperty) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    // Delete the property (this will cascade delete any related records)
+    await prisma.property.delete({
+      where: { id: propertyId },
+    });
+
+    // Note: The files (photos and videos) will need to be cleaned up
+    // by a separate cleanup job or process since we don't want to block
+    // the delete operation with file system operations
+
+    res.status(200).json({
+      message: "Property deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting property:", error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};

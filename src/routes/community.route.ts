@@ -3,6 +3,7 @@ import {
   createCommunity,
   getAgentCommunities,
   updateCommunity,
+  deleteCommunity,
 } from "../controller/community.controller";
 import { authenticateAgent } from "../middleware/auth.middleware";
 import { uploadCommunity } from "../middleware/upload.middleware";
@@ -25,5 +26,7 @@ router.patch(
   uploadCommunity.single("photo"),
   updateCommunity as RequestHandler
 );
+
+router.delete("/:id", deleteCommunity as RequestHandler);
 
 export default router;
