@@ -27,7 +27,9 @@ const createPropertySchema = z.object({
   price: z.number().positive("Price must be positive"),
   status: z.nativeEnum(PropertyStatus),
   communityId: z.string().min(1, "Community is required").optional(),
-  isFeatured: z.boolean().optional(),
+  isFeatured: z
+    .union([z.boolean(), z.string().transform((val) => val === "true")])
+    .optional(),
   bedrooms: z.number().int().positive("Bedrooms must be positive").optional(),
   bathrooms: z.number().int().positive("Bathrooms must be positive").optional(),
   description: z.string().min(1, "Description is required"),
@@ -589,6 +591,7 @@ export const getPropertiesByAgent = async (req: Request, res: Response) => {
       search,
       type,
       status,
+      isFeatured,
       minPrice,
       maxPrice,
       bedrooms,
@@ -639,6 +642,7 @@ export const getPropertiesByAgent = async (req: Request, res: Response) => {
     // Add other filters
     if (type) filter.type = type;
     if (status) filter.status = status;
+    if (isFeatured !== undefined) filter.isFeatured = isFeatured === "true";
 
     // Price range filter
     if (minPrice || maxPrice) {
@@ -746,6 +750,7 @@ export const getPropertiesByAgent = async (req: Request, res: Response) => {
         search,
         type,
         status,
+        isFeatured,
         minPrice,
         maxPrice,
         bedrooms,
