@@ -367,6 +367,58 @@ export const getPropertyById = async (
   }
 };
 
+// Public function to get property by ID with subdomain
+export const getPublicPropertyById = async (req: Request, res: Response) => {
+  try {
+    const propertyId = req.params.id;
+    const subdomain = req.query.subdomain as string;
+
+    if (!subdomain) {
+      return res.status(400).json({ message: "Subdomain is required" });
+    }
+
+    const property = await prisma.property.findFirst({
+      where: {
+        id: propertyId,
+        agent: {
+          subdomain: subdomain,
+        },
+      },
+      include: {
+        agent: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            subdomain: true,
+            profilePhoto: true,
+          },
+        },
+        community: {
+          select: {
+            id: true,
+            name: true,
+            photo: true,
+            description: true,
+            highlights: true,
+          },
+        },
+      },
+    });
+
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    res.status(200).json({ property });
+  } catch (error) {
+    console.error("Error fetching property:", error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 export const getPropertiesByCommunity = async (req: Request, res: Response) => {
   try {
     const { communityId } = req.params;

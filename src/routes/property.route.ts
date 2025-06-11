@@ -4,6 +4,7 @@ import {
   updateProperty,
   getProperties,
   getPropertyById,
+  getPublicPropertyById,
   getPropertiesByCommunity,
   getPropertiesByAgent,
   deleteProperty,
@@ -33,8 +34,11 @@ router.patch(
   updateProperty as RequestHandler
 );
 
-// Get single property by ID
-router.get("/:id", getPropertyById as RequestHandler);
+// Get single property by ID (public route)
+router.get("/:id", getPublicPropertyById as RequestHandler);
+
+// Get single property by ID (authenticated route for agents)
+// router.get("/:id", getPropertyById as RequestHandler);
 
 // Get properties by community ID (public route)
 router.get(
