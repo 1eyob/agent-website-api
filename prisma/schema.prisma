@@ -110,3 +110,15 @@ model OTP {
   used      Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+model ContactRequest {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+  interests String[]
+  address   String
+  message   String
+  createdAt DateTime @default(now())
+}

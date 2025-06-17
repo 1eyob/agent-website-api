@@ -19,7 +19,7 @@ export const login = async (req: Request, res: Response) => {
       return;
     }
 
-    // Check if email exists in AgentWebsite table
+    // Check if email exists in AgentWebsite table  
     const agent = await prisma.agent.findUnique({
       where: { email },
     });

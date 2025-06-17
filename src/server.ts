@@ -12,6 +12,7 @@ import communityRouter from "./routes/community.route";
 import propertyRouter from "./routes/property.route";
 import testimonialRouter from "./routes/testimonial.route";
 import instagramRouter from "./routes/instagram.route";
+import contactRouter from "./routes/contact.route";
 const app = express();
 const server = http.createServer(app);
 
@@ -38,6 +39,7 @@ app.use(`${apiVersion}/community`, communityRouter);
 app.use(`${apiVersion}/property`, propertyRouter);
 app.use(`${apiVersion}/testimonial`, testimonialRouter);
 app.use(`${apiVersion}/instagram`, instagramRouter);
+app.use(`${apiVersion}/contact`, contactRouter);
 const PORT = process.env.PORT || 5001;
 
 server.listen(PORT, () => {
