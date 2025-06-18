@@ -79,3 +79,87 @@ export const getContactRequests = async (
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const markContactAsRead = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  try {
+    const agentId = req.agent?.id;
+    const contactId = req.params.id;
+
+    if (!agentId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Get agent's subdomain
+    const agent = await prisma.agent.findUnique({
+      where: { id: agentId },
+      select: { subdomain: true },
+    });
+
+    if (!agent) {
+      return res.status(404).json({ message: "Agent not found" });
+    }
+
+    // Update contact status to READ, ensuring it belongs to the agent
+    const contactRequest = await prisma.contactRequest.updateMany({
+      where: {
+        id: contactId,
+        subdomain: agent.subdomain,
+      },
+      data: {
+        status: "READ",
+      },
+    });
+
+    if (contactRequest.count === 0) {
+      return res.status(404).json({ message: "Contact request not found" });
+    }
+
+    res.json({ message: "Contact marked as read" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const markAllContactsAsRead = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  try {
+    const agentId = req.agent?.id;
+
+    if (!agentId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Get agent's subdomain
+    const agent = await prisma.agent.findUnique({
+      where: { id: agentId },
+      select: { subdomain: true },
+    });
+
+    if (!agent) {
+      return res.status(404).json({ message: "Agent not found" });
+    }
+
+    // Update all unread contacts for this agent to READ
+    const result = await prisma.contactRequest.updateMany({
+      where: {
+        subdomain: agent.subdomain,
+        status: "UNREAD",
+      },
+      data: {
+        status: "READ",
+      },
+    });
+
+    res.json({
+      message: `Marked ${result.count} contacts as read`,
+      count: result.count,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

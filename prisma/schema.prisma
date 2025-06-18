@@ -113,7 +113,7 @@ model OTP {
 }
 
 model ContactRequest {
-  id        String   @id @default(uuid())
+  id        String        @id @default(uuid())
   firstName String
   lastName  String
   email     String
@@ -122,6 +122,12 @@ model ContactRequest {
   message   String
   interests String[]
   subdomain String
-  agent     Agent    @relation(fields: [subdomain], references: [subdomain], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  status    ContactStatus @default(UNREAD)
+  agent     Agent         @relation(fields: [subdomain], references: [subdomain], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+}
+
+enum ContactStatus {
+  UNREAD
+  READ
 }
