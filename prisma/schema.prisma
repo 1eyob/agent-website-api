@@ -34,9 +34,10 @@ model Agent {
   testimonials Testimonial[]
   properties   Property[]
 
-  published Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  published      Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  ContactRequest ContactRequest[]
 }
 
 model Community {
@@ -117,8 +118,10 @@ model ContactRequest {
   lastName  String
   email     String
   phone     String
-  interests String[]
   address   String
   message   String
+  interests String[]
+  subdomain String
+  agent     Agent    @relation(fields: [subdomain], references: [subdomain], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
