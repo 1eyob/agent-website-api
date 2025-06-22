@@ -103,7 +103,28 @@ async function main() {
     },
   });
 
-  console.log({ agent, ericAgent, charlesAgent });
+  // Generate a unique subdomain for Charles (luxvt)
+  const charlesLuxvtBaseSubdomain = "charlesbornheimerluxvt";
+  const charlesLuxvtUniqueSubdomain = await generateUniqueSubdomain(
+    charlesLuxvtBaseSubdomain
+  );
+
+  // Create Charles's luxvt agent profile
+  const charlesLuxvtAgent = await prisma.agent.upsert({
+    where: { email: "charles@luxvt.com" },
+    update: {
+      subdomain: charlesLuxvtUniqueSubdomain,
+    },
+    create: {
+      email: "charles@luxvt.com",
+      fullName: "Charles Bornheimer",
+      subdomain: charlesLuxvtUniqueSubdomain,
+      phone: "+1234567890",
+      bio: "I am a real estate agent",
+    },
+  });
+
+  console.log({ agent, ericAgent, charlesAgent, charlesLuxvtAgent });
 }
 
 main()
