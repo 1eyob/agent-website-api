@@ -124,7 +124,34 @@ async function main() {
     },
   });
 
-  console.log({ agent, ericAgent, charlesAgent, charlesLuxvtAgent });
+  // Generate a unique subdomain for Eyob Tadesse
+  const eyobTadesseBaseSubdomain = "eyobtadesse";
+  const eyobTadesseUniqueSubdomain = await generateUniqueSubdomain(
+    eyobTadesseBaseSubdomain
+  );
+
+  // Create Eyob Tadesse's agent profile
+  const eyobTadesseAgent = await prisma.agent.upsert({
+    where: { email: "eyobtadesse1997@gmail.com" },
+    update: {
+      subdomain: eyobTadesseUniqueSubdomain,
+    },
+    create: {
+      email: "eyobtadesse1997@gmail.com",
+      fullName: "Eyob B. Tadesse",
+      subdomain: eyobTadesseUniqueSubdomain,
+      phone: "+1234567890",
+      bio: "I am a real estate agent",
+    },
+  });
+
+  console.log({
+    agent,
+    ericAgent,
+    charlesAgent,
+    charlesLuxvtAgent,
+    eyobTadesseAgent,
+  });
 }
 
 main()
