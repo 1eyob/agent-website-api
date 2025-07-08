@@ -3,16 +3,10 @@ import {
   createAgent,
   getAgent,
   updateAgent,
-  createTestimonial,
-  updateTestimonial,
-  getAgentTestimonials,
   getAgentBySubdomain,
 } from "../controller/agent.controller";
 import { authenticateAgent } from "../middleware/auth.middleware";
-import {
-  uploadAgentProfilePhoto,
-  uploadAgentAssets,
-} from "../middleware/upload.middleware";
+import { uploadAgentAssets } from "../middleware/upload.middleware";
 
 const router = express.Router();
 

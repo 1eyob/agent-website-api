@@ -60,7 +60,10 @@ export const createAgentSchema = z.object({
   logo: z.string().optional(),
   heroImage: z.string().optional(),
   heroVideo: z.string().optional(),
-  instagramUrl: z.string().optional(),
+  instagramUrl: z.string().url().optional(),
+  twitterUrl: z.string().url().optional(),
+  facebookUrl: z.string().url().optional(),
+  linkedInUrl: z.string().url().optional(),
   blogUrl: z.string().optional(),
 });
 

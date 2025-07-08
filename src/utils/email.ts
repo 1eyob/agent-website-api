@@ -9,6 +9,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER || "eyobbirhanu01@gmail.com",
     pass: process.env.EMAIL_PASSWORD || "xpno crdu iqri ernm",
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
 
 export const sendOTPEmail = async (email: string, otp: string) => {

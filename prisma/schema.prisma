@@ -28,6 +28,9 @@ model Agent {
   heroTitle    String?
   heroSubtitle String?
   instagramUrl String?
+  twitterUrl   String?
+  facebookUrl  String?
+  linkedInUrl  String?
   blogUrl      String?
   title        String?
   communities  Community[]
