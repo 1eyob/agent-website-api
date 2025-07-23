@@ -13,6 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AgentPackage {
+  BASIC
+  DETAILED
+  CONCIERGE
+}
+
 model Agent {
   id           String        @id @default(uuid())
   subdomain    String        @unique
@@ -42,6 +48,7 @@ model Agent {
   updatedAt         DateTime           @updatedAt
   ContactRequest    ContactRequest[]
   conciergeRequests ConciergeRequest[]
+  package_name      AgentPackage?
 }
 
 model Community {
