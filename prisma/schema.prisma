@@ -37,10 +37,11 @@ model Agent {
   testimonials Testimonial[]
   properties   Property[]
 
-  published      Boolean          @default(false)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  ContactRequest ContactRequest[]
+  published         Boolean            @default(false)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  ContactRequest    ContactRequest[]
+  conciergeRequests ConciergeRequest[]
 }
 
 model Community {
@@ -133,4 +134,51 @@ model ContactRequest {
 enum ContactStatus {
   UNREAD
   READ
+}
+
+model ConciergeRequest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Contact Information
+  fullName String
+  email    String
+  phone    String
+  company  String?
+
+  // Design Preferences
+  designStyle      String?
+  primaryColor     String?
+  mustHaveFeatures String[] // Array of selected features
+
+  // Content
+  bio             String?
+  specialRequests String?
+
+  // Status tracking
+  status ConciergeStatus @default(PENDING)
+
+  // Admin notes
+  adminNotes String?
+  assignedTo String? // Admin/team member assigned to this request
+
+  // Contact attempts
+  contactAttempts Int       @default(0)
+  lastContacted   DateTime?
+
+  // Agent relationship
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+}
+
+enum ConciergeStatus {
+  PENDING // Just submitted
+  REVIEWING // Team is reviewing requirements
+  CONTACTED // Initial contact made with client
+  IN_PROGRESS // Website development started
+  REVIEW // Ready for client review
+  REVISIONS // Client requested changes
+  COMPLETED // Website delivered
+  CANCELLED // Request cancelled
 }
