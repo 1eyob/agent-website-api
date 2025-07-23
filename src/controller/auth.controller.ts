@@ -19,7 +19,7 @@ export const login = async (req: Request, res: Response) => {
       return;
     }
 
-    // Check if email exists in AgentWebsite table  
+    // Check if email exists in AgentWebsite table
     const agent = await prisma.agent.findUnique({
       where: { email },
     });
@@ -138,6 +138,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
         email: agent.email,
         fullName: agent.fullName,
         subdomain: agent.subdomain,
+        package_name: agent.package_name,
       },
     });
   } catch (error) {
