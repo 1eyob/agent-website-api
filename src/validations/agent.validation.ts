@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { AgentPackage } from "@prisma/client";
 
 export const createAgentSchema = z.object({
   subdomain: z
@@ -15,6 +16,7 @@ export const createAgentSchema = z.object({
   heroSubtitle: z.string().max(200).optional(),
   bio: z.string().max(2000).optional(),
   title: z.string().max(100).optional(),
+  package_name: z.nativeEnum(AgentPackage).optional(),
   phone: z
     .string()
     .regex(/^\+?[1-9]\d{1,14}$/)
