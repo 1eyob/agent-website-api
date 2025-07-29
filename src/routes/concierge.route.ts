@@ -23,7 +23,7 @@ router.get("/", getConciergeRequests as RequestHandler);
 router.get("/:id", getConciergeRequestById as RequestHandler);
 
 // Update a concierge request
-router.put("/:id", updateConciergeRequest as RequestHandler);
+router.patch("/:id", updateConciergeRequest as RequestHandler);
 
 // Delete a concierge request
 router.delete("/:id", deleteConciergeRequest as RequestHandler);
