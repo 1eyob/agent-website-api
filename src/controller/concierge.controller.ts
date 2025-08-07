@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { sendConciergeRequestNotification } from "../utils/email";
 
 const prisma = new PrismaClient();
 
@@ -54,6 +55,14 @@ export const createConciergeRequest = async (req: Request, res: Response) => {
         },
       },
     });
+
+    // Send email notification to admin
+    try {
+      await sendConciergeRequestNotification(conciergeRequest);
+    } catch (emailError) {
+      console.error("Failed to send email notification:", emailError);
+      // Don't fail the request if email fails
+    }
 
     res.status(201).json({
       success: true,
