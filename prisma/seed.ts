@@ -145,12 +145,34 @@ async function main() {
     },
   });
 
+  // Generate a unique subdomain for Jijo Mavila
+  const jijoMavilaBaseSubdomain = "jijomavila";
+  const jijoMavilaUniqueSubdomain = await generateUniqueSubdomain(
+    jijoMavilaBaseSubdomain
+  );
+
+  // Create Jijo Mavila's agent profile
+  const jijoMavilaAgent = await prisma.agent.upsert({
+    where: { email: "jijo.mavila@zyxware.com" },
+    update: {
+      subdomain: jijoMavilaUniqueSubdomain,
+    },
+    create: {
+      email: "jijo.mavila@zyxware.com",
+      fullName: "Jijo Mavila",
+      subdomain: jijoMavilaUniqueSubdomain,
+      phone: "+1234567890",
+      bio: "I am a real estate agent",
+    },
+  });
+
   console.log({
     agent,
     ericAgent,
     charlesAgent,
     charlesLuxvtAgent,
     eyobTadesseAgent,
+    jijoMavilaAgent,
   });
 }
 
