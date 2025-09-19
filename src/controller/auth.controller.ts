@@ -214,9 +214,9 @@ export const verifyOTP = async (req: Request, res: Response) => {
 
 export const autoLogin = async (req: Request, res: Response) => {
   try {
-    const { email, ts, token: linkToken, entityId } = req.query;
-
-    if (!email || !ts || !linkToken || !entityId) {
+    const { email, ts, token: linkToken, entityid } = req.body;
+    console.log(email, ts, linkToken, entityid);
+    if (!email || !ts || !linkToken || !entityid) {
       return res
         .status(400)
         .json({ error: "Invalid link - missing parameters" });
@@ -230,6 +230,7 @@ export const autoLogin = async (req: Request, res: Response) => {
     // Check expiry
     const linkTimestamp = parseInt(ts as string);
     if (Date.now() - linkTimestamp > LINK_EXPIRY) {
+      console.log("Link expired");
       return res.status(400).json({ error: "Link expired" });
     }
 
@@ -255,7 +256,7 @@ export const autoLogin = async (req: Request, res: Response) => {
     if (agent && !agent.entityId) {
       agent = await prisma.agent.update({
         where: { email: email as string },
-        data: { entityId: entityId as string },
+        data: { entityId: entityid as string },
       });
     }
 
@@ -275,7 +276,7 @@ export const autoLogin = async (req: Request, res: Response) => {
             fullName: fullName,
             subdomain: uniqueSubdomain,
             package_name: "DETAILED", // Default package
-            entityId: entityId as string,
+            entityId: entityid as string,
           },
         });
 
