@@ -217,7 +217,7 @@ export const autoLogin = async (req: Request, res: Response) => {
   console.log("📥 Request body:", req.body);
   console.log("📥 Request query:", req.query);
   console.log("📥 Request method:", req.method);
-  
+
   try {
     const { email, ts, token: linkToken, entityid } = req.body;
     console.log("📋 Extracted parameters:");
@@ -225,7 +225,7 @@ export const autoLogin = async (req: Request, res: Response) => {
     console.log("  - ts:", ts);
     console.log("  - linkToken:", linkToken);
     console.log("  - entityid:", entityid);
-    
+
     if (!email || !ts || !linkToken || !entityid) {
       console.log("❌ Missing required parameters");
       console.log("  - email present:", !!email);
@@ -266,12 +266,12 @@ export const autoLogin = async (req: Request, res: Response) => {
     console.log("🔒 Token validation:");
     console.log("  - hashData:", hashData);
     console.log("  - received linkToken:", linkToken);
-    
+
     const validHash = crypto
       .createHmac("sha256", SECRET)
       .update(hashData)
       .digest("hex");
-    
+
     console.log("  - computed validHash:", validHash);
     console.log("  - tokens match:", String(linkToken) === validHash);
 
@@ -292,7 +292,7 @@ export const autoLogin = async (req: Request, res: Response) => {
     let agent = await prisma.agent.findUnique({
       where: { email: email as string },
     });
-    
+
     if (agent) {
       console.log("✅ Found existing agent:");
       console.log("  - id:", agent.id);
@@ -340,7 +340,7 @@ export const autoLogin = async (req: Request, res: Response) => {
           entityId: entityid as string,
         };
         console.log("  - agentData:", agentData);
-        
+
         agent = await prisma.agent.create({
           data: agentData,
         });
@@ -355,16 +355,20 @@ export const autoLogin = async (req: Request, res: Response) => {
         console.log("❌ Error creating agent:", createError);
         console.log("  - error code:", createError.code);
         console.log("  - error message:", createError.message);
-        
+
         // If email already exists, try to find by email instead
         if (createError.code === "P2002") {
-          console.log("🔄 Duplicate key error, trying to find existing agent...");
+          console.log(
+            "🔄 Duplicate key error, trying to find existing agent..."
+          );
           agent = await prisma.agent.findUnique({
             where: { email: email as string },
           });
 
           if (!agent) {
-            console.log("❌ Could not find existing agent after duplicate error");
+            console.log(
+              "❌ Could not find existing agent after duplicate error"
+            );
             return res.status(400).json({
               error: "Failed to create agent - email may already exist",
             });
@@ -386,30 +390,26 @@ export const autoLogin = async (req: Request, res: Response) => {
     console.log("  - entityId:", agent.entityId);
     console.log("  - package_name:", agent.package_name);
     console.log("  - createdAt:", agent.createdAt);
-    
+
     // Generate JWT token for the authenticated user
     console.log("🔑 Generating JWT token...");
     const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
     console.log("  - JWT_SECRET:", JWT_SECRET.substring(0, 8) + "...");
-    
+
     const tokenPayload = {
       id: agent.id,
       email: agent.email,
     };
     console.log("  - tokenPayload:", tokenPayload);
-    
-    const token = jwt.sign(
-      tokenPayload,
-      JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+
+    const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "7d" });
     console.log("  - generated token length:", token.length);
 
     const isNewlyCreated = agent.createdAt.getTime() > Date.now() - 5000;
     const message = isNewlyCreated
       ? "Agent registered and logged in successfully"
       : "Auto login successful";
-    
+
     console.log("📤 Preparing response:");
     console.log("  - isNewlyCreated:", isNewlyCreated);
     console.log("  - message:", message);
@@ -426,7 +426,7 @@ export const autoLogin = async (req: Request, res: Response) => {
         entityId: agent.entityId,
       },
     };
-    
+
     console.log("  - responseData:", responseData);
     console.log("✅ AUTO LOGIN COMPLETED SUCCESSFULLY");
 
