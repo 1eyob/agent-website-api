@@ -213,10 +213,25 @@ export const verifyOTP = async (req: Request, res: Response) => {
 };
 
 export const autoLogin = async (req: Request, res: Response) => {
+  console.log("🚀 AUTO LOGIN STARTED");
+  console.log("📥 Request body:", req.body);
+  console.log("📥 Request query:", req.query);
+  console.log("📥 Request method:", req.method);
+  
   try {
     const { email, ts, token: linkToken, entityid } = req.body;
-    console.log(email, ts, linkToken, entityid);
+    console.log("📋 Extracted parameters:");
+    console.log("  - email:", email);
+    console.log("  - ts:", ts);
+    console.log("  - linkToken:", linkToken);
+    console.log("  - entityid:", entityid);
+    
     if (!email || !ts || !linkToken || !entityid) {
+      console.log("❌ Missing required parameters");
+      console.log("  - email present:", !!email);
+      console.log("  - ts present:", !!ts);
+      console.log("  - linkToken present:", !!linkToken);
+      console.log("  - entityid present:", !!entityid);
       return res
         .status(400)
         .json({ error: "Invalid link - missing parameters" });
@@ -225,24 +240,40 @@ export const autoLogin = async (req: Request, res: Response) => {
     // Get secret from environment variable
     const SECRET =
       process.env.AUTO_LOGIN_SECRET || "a384b6463fc216a5f8ecb6670f86456a";
+    console.log("🔐 Using SECRET:", SECRET.substring(0, 8) + "...");
 
     // 1. Check timestamp validity (5 min window) - matches PHP logic
     const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
     const linkTimestamp = parseInt(ts as string);
     const timeDifference = Math.abs(currentTime - linkTimestamp);
 
+    console.log("⏰ Timestamp validation:");
+    console.log("  - currentTime:", currentTime);
+    console.log("  - linkTimestamp:", linkTimestamp);
+    console.log("  - timeDifference:", timeDifference);
+    console.log("  - maxAllowed:", 300);
+    console.log("  - isValid:", timeDifference <= 300);
+
     if (timeDifference > 300) {
       // 300 seconds = 5 minutes
-      console.log("Link expired");
+      console.log("❌ Link expired - time difference exceeds 300 seconds");
       return res.status(400).json({ error: "Link expired" });
     }
+    console.log("✅ Timestamp is valid");
 
     // 2. Verify token - matches PHP logic with pipe separator
     const hashData = `${email}|${ts}`;
+    console.log("🔒 Token validation:");
+    console.log("  - hashData:", hashData);
+    console.log("  - received linkToken:", linkToken);
+    
     const validHash = crypto
       .createHmac("sha256", SECRET)
       .update(hashData)
       .digest("hex");
+    
+    console.log("  - computed validHash:", validHash);
+    console.log("  - tokens match:", String(linkToken) === validHash);
 
     // Use secure comparison to prevent timing attacks
     if (
@@ -251,79 +282,140 @@ export const autoLogin = async (req: Request, res: Response) => {
         Buffer.from(validHash)
       )
     ) {
+      console.log("❌ Token validation failed");
       return res.status(403).json({ error: "Invalid token" });
     }
+    console.log("✅ Token is valid");
 
     // Try to find existing agent first
+    console.log("👤 Looking for existing agent with email:", email);
     let agent = await prisma.agent.findUnique({
       where: { email: email as string },
     });
+    
+    if (agent) {
+      console.log("✅ Found existing agent:");
+      console.log("  - id:", agent.id);
+      console.log("  - email:", agent.email);
+      console.log("  - fullName:", agent.fullName);
+      console.log("  - subdomain:", agent.subdomain);
+      console.log("  - entityId:", agent.entityId);
+      console.log("  - package_name:", agent.package_name);
+    } else {
+      console.log("❌ No existing agent found");
+    }
 
     // If agent exists but doesn't have entityId, update it
     if (agent && !agent.entityId) {
+      console.log("🔄 Updating agent with entityId:", entityid);
       agent = await prisma.agent.update({
         where: { email: email as string },
         data: { entityId: entityid as string },
       });
+      console.log("✅ Agent updated with entityId");
     }
 
     // If agent doesn't exist, create new agent using data extracted from email
     if (!agent) {
+      console.log("🆕 Creating new agent for email:", email);
       try {
         // Extract fullName and subdomain from email
         const { fullName, subdomain } = extractFromEmail(email as string);
+        console.log("📧 Extracted from email:");
+        console.log("  - fullName:", fullName);
+        console.log("  - base subdomain:", subdomain);
 
         // Generate a unique subdomain if the extracted one is taken
+        console.log("🔍 Generating unique subdomain...");
         const uniqueSubdomain = await generateUniqueSubdomain(subdomain);
+        console.log("  - unique subdomain:", uniqueSubdomain);
 
         // Create new agent
+        console.log("💾 Creating agent with data:");
+        const agentData = {
+          email: email as string,
+          fullName: fullName,
+          subdomain: uniqueSubdomain,
+          package_name: "DETAILED" as const, // Default package
+          entityId: entityid as string,
+        };
+        console.log("  - agentData:", agentData);
+        
         agent = await prisma.agent.create({
-          data: {
-            email: email as string,
-            fullName: fullName,
-            subdomain: uniqueSubdomain,
-            package_name: "DETAILED", // Default package
-            entityId: entityid as string,
-          },
+          data: agentData,
         });
 
-        console.log(
-          `New agent registered via auto login: ${agent.email} with subdomain: ${uniqueSubdomain}`
-        );
+        console.log("✅ New agent created successfully:");
+        console.log("  - id:", agent.id);
+        console.log("  - email:", agent.email);
+        console.log("  - fullName:", agent.fullName);
+        console.log("  - subdomain:", agent.subdomain);
+        console.log("  - entityId:", agent.entityId);
       } catch (createError: any) {
+        console.log("❌ Error creating agent:", createError);
+        console.log("  - error code:", createError.code);
+        console.log("  - error message:", createError.message);
+        
         // If email already exists, try to find by email instead
         if (createError.code === "P2002") {
+          console.log("🔄 Duplicate key error, trying to find existing agent...");
           agent = await prisma.agent.findUnique({
             where: { email: email as string },
           });
 
           if (!agent) {
+            console.log("❌ Could not find existing agent after duplicate error");
             return res.status(400).json({
               error: "Failed to create agent - email may already exist",
             });
           }
+          console.log("✅ Found existing agent after duplicate error");
         } else {
+          console.log("❌ Unknown error creating agent, rethrowing");
           throw createError;
         }
       }
     }
 
     // At this point, agent should always exist (either found or created)
+    console.log("🎯 Final agent object:");
+    console.log("  - id:", agent.id);
+    console.log("  - email:", agent.email);
+    console.log("  - fullName:", agent.fullName);
+    console.log("  - subdomain:", agent.subdomain);
+    console.log("  - entityId:", agent.entityId);
+    console.log("  - package_name:", agent.package_name);
+    console.log("  - createdAt:", agent.createdAt);
+    
     // Generate JWT token for the authenticated user
+    console.log("🔑 Generating JWT token...");
+    const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+    console.log("  - JWT_SECRET:", JWT_SECRET.substring(0, 8) + "...");
+    
+    const tokenPayload = {
+      id: agent.id,
+      email: agent.email,
+    };
+    console.log("  - tokenPayload:", tokenPayload);
+    
     const token = jwt.sign(
-      {
-        id: agent.id,
-        email: agent.email,
-      },
-      process.env.JWT_SECRET || "your-secret-key",
+      tokenPayload,
+      JWT_SECRET,
       { expiresIn: "7d" }
     );
+    console.log("  - generated token length:", token.length);
 
-    res.status(200).json({
-      message:
-        agent.createdAt.getTime() > Date.now() - 5000
-          ? "Agent registered and logged in successfully"
-          : "Auto login successful",
+    const isNewlyCreated = agent.createdAt.getTime() > Date.now() - 5000;
+    const message = isNewlyCreated
+      ? "Agent registered and logged in successfully"
+      : "Auto login successful";
+    
+    console.log("📤 Preparing response:");
+    console.log("  - isNewlyCreated:", isNewlyCreated);
+    console.log("  - message:", message);
+
+    const responseData = {
+      message,
       token,
       agent: {
         id: agent.id,
@@ -333,9 +425,17 @@ export const autoLogin = async (req: Request, res: Response) => {
         package_name: agent.package_name,
         entityId: agent.entityId,
       },
-    });
-  } catch (error) {
-    console.error("Auto login error:", error);
+    };
+    
+    console.log("  - responseData:", responseData);
+    console.log("✅ AUTO LOGIN COMPLETED SUCCESSFULLY");
+
+    res.status(200).json(responseData);
+  } catch (error: any) {
+    console.error("💥 AUTO LOGIN ERROR:", error);
+    console.error("  - error name:", error?.name);
+    console.error("  - error message:", error?.message);
+    console.error("  - error stack:", error?.stack);
     res.status(500).json({ error: "Internal server error" });
   }
 };
