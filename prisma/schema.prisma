@@ -24,6 +24,7 @@ model Agent {
   subdomain    String        @unique
   fullName     String
   profilePhoto String?
+  entityId     String?
   bio          String?
   phone        String?
   email        String        @unique

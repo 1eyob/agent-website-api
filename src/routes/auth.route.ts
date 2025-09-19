@@ -1,5 +1,5 @@
 import express, { RequestHandler } from "express";
-import { login, verifyOTP } from "../controller/auth.controller";
+import { login, verifyOTP, autoLogin } from "../controller/auth.controller";
 
 const router = express.Router();
 
@@ -8,5 +8,7 @@ router.post("/login", login as RequestHandler);
 
 // Verify OTP and complete login
 router.post("/verify-otp", verifyOTP as RequestHandler);
+
+router.get("/auto-login", autoLogin as RequestHandler);
 
 export default router;
