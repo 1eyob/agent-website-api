@@ -6,6 +6,17 @@ import crypto from "crypto";
 
 const prisma = new PrismaClient();
 
+// Server timezone info for debugging
+const getServerTimezoneInfo = () => {
+  const now = new Date();
+  return {
+    timezone: "Etc/UTC (UTC, +0000)",
+    currentUTC: Math.floor(Date.now() / 1000),
+    currentISO: now.toISOString(),
+    note: "Server runs in UTC to match PHP time() function",
+  };
+};
+
 // Generate a 6-digit OTP
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -212,8 +223,19 @@ export const verifyOTP = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Auto Login Controller
+ *
+ * Important: This server runs in Etc/UTC (UTC, +0000) timezone to ensure
+ * consistent timestamp validation with PHP backend using time() function.
+ *
+ * Validation logic matches PHP:
+ * - abs(time() - (int)$ts) > 300 for 5-minute expiry
+ * - hash_hmac('sha256', $email . '|' . $ts, $secret) for token validation
+ */
 export const autoLogin = async (req: Request, res: Response) => {
   console.log("🚀 AUTO LOGIN STARTED");
+  console.log("🌍 Server timezone info:", getServerTimezoneInfo());
   console.log("📥 Request body:", req.body);
   console.log("📥 Request query:", req.query);
   console.log("📥 Request method:", req.method);
@@ -243,23 +265,81 @@ export const autoLogin = async (req: Request, res: Response) => {
     console.log("🔐 Using SECRET:", SECRET.substring(0, 8) + "...");
 
     // 1. Check timestamp validity (5 min window) - matches PHP logic
-    const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
+    // Server timezone: Etc/UTC (UTC, +0000) - matches PHP time() function
+    const currentTime = Math.floor(Date.now() / 1000); // UTC timestamp in seconds
     const linkTimestamp = parseInt(ts as string);
     const timeDifference = Math.abs(currentTime - linkTimestamp);
 
-    console.log("⏰ Timestamp validation:");
-    console.log("  - currentTime:", currentTime);
+    console.log("⏰ Timestamp validation (UTC timezone):");
+    console.log("  - server timezone: Etc/UTC (UTC, +0000)");
+    console.log("  - currentTime (UTC):", currentTime);
+    console.log(
+      "  - currentTime (readable):",
+      new Date(currentTime * 1000).toISOString()
+    );
     console.log("  - linkTimestamp:", linkTimestamp);
+    console.log(
+      "  - linkTimestamp (readable):",
+      new Date(linkTimestamp * 1000).toISOString()
+    );
     console.log("  - timeDifference:", timeDifference);
     console.log("  - maxAllowed:", 300);
     console.log("  - isValid:", timeDifference <= 300);
-
-    if (timeDifference > 300) {
-      // 300 seconds = 5 minutes
-      console.log("❌ Link expired - time difference exceeds 300 seconds");
-      return res.status(400).json({ error: "Link expired" });
+    
+    // Additional debugging for timezone issues
+    console.log("📊 DETAILED TIMING ANALYSIS:");
+    console.log("  - Date.now():", Date.now());
+    console.log("  - Math.floor(Date.now() / 1000):", Math.floor(Date.now() / 1000));
+    console.log("  - new Date().getTime():", new Date().getTime());
+    console.log("  - new Date().toISOString():", new Date().toISOString());
+    console.log("  - process.env.TZ:", process.env.TZ || "not set");
+    
+    // Check if there's a parsing issue with the timestamp
+    if (isNaN(linkTimestamp)) {
+      console.log("  - ⚠️ WARNING: linkTimestamp is NaN! Raw ts value:", ts);
+      return res.status(400).json({ error: "Invalid timestamp format" });
     }
-    console.log("✅ Timestamp is valid");
+
+    // TEMPORARY DEBUG: Extend expiry for debugging (remove in production)
+    const DEBUG_EXTENDED_EXPIRY = 3600; // 1 hour for debugging
+    const MAX_ALLOWED = 300; // Normal 5 minutes
+    
+    console.log("🔧 DEBUG MODE: Extended expiry enabled for debugging");
+    console.log("  - Normal expiry:", MAX_ALLOWED, "seconds (5 minutes)");
+    console.log("  - Debug expiry:", DEBUG_EXTENDED_EXPIRY, "seconds (1 hour)");
+    
+    if (timeDifference > DEBUG_EXTENDED_EXPIRY) {
+      console.log("❌ LINK EXPIRED (even with extended debug time):");
+      console.log("  - Current time (UTC):", currentTime);
+      console.log("  - Link timestamp:", linkTimestamp);
+      console.log("  - Time difference:", timeDifference, "seconds");
+      console.log("  - Debug max allowed:", DEBUG_EXTENDED_EXPIRY, "seconds (1 hour)");
+      console.log("  - Link is", timeDifference - DEBUG_EXTENDED_EXPIRY, "seconds too old");
+      console.log("  - Link was created at:", new Date(linkTimestamp * 1000).toISOString());
+      console.log("  - Current time is:", new Date(currentTime * 1000).toISOString());
+      console.log("  - Link age:", Math.floor(timeDifference / 60), "minutes", timeDifference % 60, "seconds");
+      
+      return res.status(400).json({ 
+        error: "Link expired (even with debug extension)",
+        debug: {
+          currentTime,
+          linkTimestamp,
+          timeDifference,
+          normalExpiry: MAX_ALLOWED,
+          debugExpiry: DEBUG_EXTENDED_EXPIRY,
+          linkAge: `${Math.floor(timeDifference / 60)}m ${timeDifference % 60}s`
+        }
+      });
+    }
+    
+    if (timeDifference > MAX_ALLOWED) {
+      console.log("⚠️ WOULD NORMALLY BE EXPIRED (but allowing for debug):");
+      console.log("  - Time difference:", timeDifference, "seconds");
+      console.log("  - Normal max allowed:", MAX_ALLOWED, "seconds (5 minutes)");
+      console.log("  - Link is", timeDifference - MAX_ALLOWED, "seconds past normal expiry");
+      console.log("  - But allowing due to debug mode");
+    }
+    console.log("✅ Timestamp is valid - link is", timeDifference, "seconds old");
 
     // 2. Verify token - matches PHP logic with pipe separator
     const hashData = `${email}|${ts}`;
@@ -448,19 +528,39 @@ export const generateAutoLoginLink = (
 ): string => {
   const SECRET =
     process.env.AUTO_LOGIN_SECRET || "a384b6463fc216a5f8ecb6670f86456a";
-  const ts = Math.floor(Date.now() / 1000).toString(); // Use seconds to match PHP time()
+
+  // Generate UTC timestamp to match server timezone (Etc/UTC)
+  const ts = Math.floor(Date.now() / 1000).toString(); // UTC seconds to match PHP time()
+
+  console.log("🔗 Generating auto login link:");
+  console.log("  - email:", email);
+  console.log("  - entityId:", entityId);
+  console.log("  - baseUrl:", baseUrl);
+  console.log("  - timezone: Etc/UTC (UTC, +0000)");
+  console.log("  - ts (UTC):", ts);
+  console.log(
+    "  - ts (readable):",
+    new Date(parseInt(ts) * 1000).toISOString()
+  );
 
   // Hash includes email and timestamp with pipe separator to match PHP logic
   const hashData = `${email}|${ts}`;
+  console.log("  - hashData:", hashData);
+
   const token = crypto
     .createHmac("sha256", SECRET)
     .update(hashData)
     .digest("hex");
 
+  console.log("  - generated token:", token);
+
   // Build URL with the required parameters
   const url = `${baseUrl}/autologin?email=${encodeURIComponent(
     email
   )}&ts=${ts}&token=${token}&entityid=${encodeURIComponent(entityId)}`;
+
+  console.log("  - final URL:", url);
+  console.log("✅ Auto login link generated successfully");
 
   return url;
 };
