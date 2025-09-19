@@ -225,25 +225,32 @@ export const autoLogin = async (req: Request, res: Response) => {
     // Get secret from environment variable
     const SECRET =
       process.env.AUTO_LOGIN_SECRET || "a384b6463fc216a5f8ecb6670f86456a";
-    const LINK_EXPIRY = 30 * 60 * 1000; // 30 minutes
 
-    // Check expiry
+    // 1. Check timestamp validity (5 min window) - matches PHP logic
+    const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
     const linkTimestamp = parseInt(ts as string);
-    if (Date.now() - linkTimestamp > LINK_EXPIRY) {
+    const timeDifference = Math.abs(currentTime - linkTimestamp);
+
+    if (timeDifference > 300) {
+      // 300 seconds = 5 minutes
       console.log("Link expired");
       return res.status(400).json({ error: "Link expired" });
     }
 
-    // Hash only includes email and timestamp since we extract other data from email
-    const hashData = `${email}${ts}`;
-
-    // Recompute the hash to verify authenticity
+    // 2. Verify token - matches PHP logic with pipe separator
+    const hashData = `${email}|${ts}`;
     const validHash = crypto
       .createHmac("sha256", SECRET)
       .update(hashData)
       .digest("hex");
 
-    if (String(linkToken) !== validHash) {
+    // Use secure comparison to prevent timing attacks
+    if (
+      !crypto.timingSafeEqual(
+        Buffer.from(String(linkToken)),
+        Buffer.from(validHash)
+      )
+    ) {
       return res.status(403).json({ error: "Invalid token" });
     }
 
@@ -331,4 +338,29 @@ export const autoLogin = async (req: Request, res: Response) => {
     console.error("Auto login error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
+};
+
+// Helper function to generate auto login links - compatible with PHP validation
+export const generateAutoLoginLink = (
+  email: string,
+  entityId: string,
+  baseUrl: string = "https://id.land"
+): string => {
+  const SECRET =
+    process.env.AUTO_LOGIN_SECRET || "a384b6463fc216a5f8ecb6670f86456a";
+  const ts = Math.floor(Date.now() / 1000).toString(); // Use seconds to match PHP time()
+
+  // Hash includes email and timestamp with pipe separator to match PHP logic
+  const hashData = `${email}|${ts}`;
+  const token = crypto
+    .createHmac("sha256", SECRET)
+    .update(hashData)
+    .digest("hex");
+
+  // Build URL with the required parameters
+  const url = `${baseUrl}/autologin?email=${encodeURIComponent(
+    email
+  )}&ts=${ts}&token=${token}&entityid=${encodeURIComponent(entityId)}`;
+
+  return url;
 };
