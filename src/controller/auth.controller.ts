@@ -285,15 +285,18 @@ export const autoLogin = async (req: Request, res: Response) => {
     console.log("  - timeDifference:", timeDifference);
     console.log("  - maxAllowed:", 300);
     console.log("  - isValid:", timeDifference <= 300);
-    
+
     // Additional debugging for timezone issues
     console.log("📊 DETAILED TIMING ANALYSIS:");
     console.log("  - Date.now():", Date.now());
-    console.log("  - Math.floor(Date.now() / 1000):", Math.floor(Date.now() / 1000));
+    console.log(
+      "  - Math.floor(Date.now() / 1000):",
+      Math.floor(Date.now() / 1000)
+    );
     console.log("  - new Date().getTime():", new Date().getTime());
     console.log("  - new Date().toISOString():", new Date().toISOString());
     console.log("  - process.env.TZ:", process.env.TZ || "not set");
-    
+
     // Check if there's a parsing issue with the timestamp
     if (isNaN(linkTimestamp)) {
       console.log("  - ⚠️ WARNING: linkTimestamp is NaN! Raw ts value:", ts);
@@ -303,23 +306,43 @@ export const autoLogin = async (req: Request, res: Response) => {
     // TEMPORARY DEBUG: Extend expiry for debugging (remove in production)
     const DEBUG_EXTENDED_EXPIRY = 3600; // 1 hour for debugging
     const MAX_ALLOWED = 300; // Normal 5 minutes
-    
+
     console.log("🔧 DEBUG MODE: Extended expiry enabled for debugging");
     console.log("  - Normal expiry:", MAX_ALLOWED, "seconds (5 minutes)");
     console.log("  - Debug expiry:", DEBUG_EXTENDED_EXPIRY, "seconds (1 hour)");
-    
+
     if (timeDifference > DEBUG_EXTENDED_EXPIRY) {
       console.log("❌ LINK EXPIRED (even with extended debug time):");
       console.log("  - Current time (UTC):", currentTime);
       console.log("  - Link timestamp:", linkTimestamp);
       console.log("  - Time difference:", timeDifference, "seconds");
-      console.log("  - Debug max allowed:", DEBUG_EXTENDED_EXPIRY, "seconds (1 hour)");
-      console.log("  - Link is", timeDifference - DEBUG_EXTENDED_EXPIRY, "seconds too old");
-      console.log("  - Link was created at:", new Date(linkTimestamp * 1000).toISOString());
-      console.log("  - Current time is:", new Date(currentTime * 1000).toISOString());
-      console.log("  - Link age:", Math.floor(timeDifference / 60), "minutes", timeDifference % 60, "seconds");
-      
-      return res.status(400).json({ 
+      console.log(
+        "  - Debug max allowed:",
+        DEBUG_EXTENDED_EXPIRY,
+        "seconds (1 hour)"
+      );
+      console.log(
+        "  - Link is",
+        timeDifference - DEBUG_EXTENDED_EXPIRY,
+        "seconds too old"
+      );
+      console.log(
+        "  - Link was created at:",
+        new Date(linkTimestamp * 1000).toISOString()
+      );
+      console.log(
+        "  - Current time is:",
+        new Date(currentTime * 1000).toISOString()
+      );
+      console.log(
+        "  - Link age:",
+        Math.floor(timeDifference / 60),
+        "minutes",
+        timeDifference % 60,
+        "seconds"
+      );
+
+      return res.status(400).json({
         error: "Link expired (even with debug extension)",
         debug: {
           currentTime,
@@ -327,19 +350,33 @@ export const autoLogin = async (req: Request, res: Response) => {
           timeDifference,
           normalExpiry: MAX_ALLOWED,
           debugExpiry: DEBUG_EXTENDED_EXPIRY,
-          linkAge: `${Math.floor(timeDifference / 60)}m ${timeDifference % 60}s`
-        }
+          linkAge: `${Math.floor(timeDifference / 60)}m ${
+            timeDifference % 60
+          }s`,
+        },
       });
     }
-    
+
     if (timeDifference > MAX_ALLOWED) {
       console.log("⚠️ WOULD NORMALLY BE EXPIRED (but allowing for debug):");
       console.log("  - Time difference:", timeDifference, "seconds");
-      console.log("  - Normal max allowed:", MAX_ALLOWED, "seconds (5 minutes)");
-      console.log("  - Link is", timeDifference - MAX_ALLOWED, "seconds past normal expiry");
+      console.log(
+        "  - Normal max allowed:",
+        MAX_ALLOWED,
+        "seconds (5 minutes)"
+      );
+      console.log(
+        "  - Link is",
+        timeDifference - MAX_ALLOWED,
+        "seconds past normal expiry"
+      );
       console.log("  - But allowing due to debug mode");
     }
-    console.log("✅ Timestamp is valid - link is", timeDifference, "seconds old");
+    console.log(
+      "✅ Timestamp is valid - link is",
+      timeDifference,
+      "seconds old"
+    );
 
     // 2. Verify token - matches PHP logic with pipe separator
     const hashData = `${email}|${ts}`;
