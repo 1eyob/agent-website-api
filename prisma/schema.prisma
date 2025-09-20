@@ -20,29 +20,30 @@ enum AgentPackage {
 }
 
 model Agent {
-  id           String        @id @default(uuid())
-  subdomain    String        @unique
-  fullName     String
-  profilePhoto String?
-  entityId     String?
-  bio          String?
-  phone        String?
-  email        String        @unique
-  officeHours  Json?
-  logo         String?
-  heroImage    String?
-  heroVideo    String?
-  heroTitle    String?
-  heroSubtitle String?
-  instagramUrl String?
-  twitterUrl   String?
-  facebookUrl  String?
-  linkedInUrl  String?
-  blogUrl      String?
-  title        String?
-  communities  Community[]
-  testimonials Testimonial[]
-  properties   Property[]
+  id            String         @id @default(uuid())
+  subdomain     String         @unique
+  fullName      String
+  profilePhoto  String?
+  entityId      String?
+  bio           String?
+  phone         String?
+  email         String         @unique
+  officeHours   Json?
+  logo          String?
+  heroImage     String?
+  heroVideo     String?
+  heroTitle     String?
+  heroSubtitle  String?
+  instagramUrl  String?
+  twitterUrl    String?
+  facebookUrl   String?
+  linkedInUrl   String?
+  blogUrl       String?
+  title         String?
+  communities   Community[]
+  testimonials  Testimonial[]
+  properties    Property[]
+  luxvtListings LuxvtListing[]
 
   published         Boolean            @default(false)
   createdAt         DateTime           @default(now())
@@ -189,4 +190,29 @@ enum ConciergeStatus {
   REVISIONS // Client requested changes
   COMPLETED // Website delivered
   CANCELLED // Request cancelled
+}
+
+model LuxvtListing {
+  id                String @id @default(uuid())
+  listingId         String // The external listing ID from LuxVT
+  address           String
+  photo             String
+  website           String
+  city              String
+  state             String
+  currency          String
+  squareFeet        String
+  unitOfMeasurement String
+  propertyName      String
+  price             String
+
+  // Relationship with Agent
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Compound unique constraint to allow same listingId for different agents
+  @@unique([listingId, agentId], name: "listingId_agentId")
 }

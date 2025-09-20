@@ -14,6 +14,7 @@ import testimonialRouter from "./routes/testimonial.route";
 import instagramRouter from "./routes/instagram.route";
 import contactRouter from "./routes/contact.route";
 import conciergeRouter from "./routes/concierge.route";
+import luxvtListingRouter from "./routes/luxvt-listing.route";
 const app = express();
 const server = http.createServer(app);
 
@@ -42,6 +43,7 @@ app.use(`${apiVersion}/testimonial`, testimonialRouter);
 app.use(`${apiVersion}/instagram`, instagramRouter);
 app.use(`${apiVersion}/contact`, contactRouter);
 app.use(`${apiVersion}/concierge`, conciergeRouter);
+app.use(`${apiVersion}/luxvt-listings`, luxvtListingRouter);
 const PORT = process.env.PORT || 5001;
 
 server.listen(PORT, () => {
