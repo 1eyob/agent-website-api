@@ -17,10 +17,7 @@ export const createAgentSchema = z.object({
   bio: z.string().max(2000).optional(),
   title: z.string().max(100).optional(),
   package_name: z.nativeEnum(AgentPackage).optional(),
-  phone: z
-    .string()
-    .regex(/^\+?[1-9]\d{1,14}$/)
-    .default("+1234567890"),
+  phone: z.string(),
   email: z.string().email(),
   officeHours: z.object({
     monday: z.object({
@@ -67,6 +64,18 @@ export const createAgentSchema = z.object({
   facebookUrl: z.string().url().optional(),
   linkedInUrl: z.string().url().optional(),
   blogUrl: z.string().optional(),
+
+  // LuxVT API fields
+  luxvtId: z.string().optional(),
+  city: z.string().max(100).optional(),
+  state: z.string().max(50).optional(),
+  country: z.string().max(50).optional(),
+  zip: z.string().max(20).optional(),
+  license: z.string().max(50).optional(),
+  website: z.string().optional(),
+  isElite: z.boolean().optional(),
+  brokerage: z.string().max(200).optional(),
+  agentGrade: z.string().max(50).optional(),
 });
 
 export type CreateAgentInput = z.infer<typeof createAgentSchema>;

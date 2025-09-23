@@ -20,26 +20,39 @@ enum AgentPackage {
 }
 
 model Agent {
-  id            String         @id @default(uuid())
-  subdomain     String         @unique
-  fullName      String
-  profilePhoto  String?
-  entityId      String?
-  bio           String?
-  phone         String?
-  email         String         @unique
-  officeHours   Json?
-  logo          String?
-  heroImage     String?
-  heroVideo     String?
-  heroTitle     String?
-  heroSubtitle  String?
-  instagramUrl  String?
-  twitterUrl    String?
-  facebookUrl   String?
-  linkedInUrl   String?
-  blogUrl       String?
-  title         String?
+  id           String  @id @default(uuid())
+  subdomain    String  @unique
+  fullName     String
+  profilePhoto String?
+  entityId     String?
+  bio          String?
+  phone        String?
+  email        String  @unique
+  officeHours  Json?
+  logo         String?
+  heroImage    String?
+  heroVideo    String?
+  heroTitle    String?
+  heroSubtitle String?
+  instagramUrl String?
+  twitterUrl   String?
+  facebookUrl  String?
+  linkedInUrl  String?
+  blogUrl      String?
+  title        String?
+
+  // LuxVT API fields
+  luxvtId    String? @unique // External LuxVT agent ID
+  city       String?
+  state      String?
+  country    String?
+  zip        String?
+  license    String?
+  website    String?
+  isElite    Boolean @default(false)
+  brokerage  String?
+  agentGrade String?
+
   communities   Community[]
   testimonials  Testimonial[]
   properties    Property[]

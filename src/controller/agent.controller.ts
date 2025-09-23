@@ -117,6 +117,7 @@ export const getAgent = async (req: Request, res: Response) => {
         communities: true,
         testimonials: true,
         properties: true,
+        luxvtListings: true,
       },
     });
 
@@ -180,6 +181,22 @@ export const updateAgent = async (req: Request, res: Response) => {
       if (existingAgent) {
         return res.status(400).json({
           error: "Subdomain is already taken by another agent",
+        });
+      }
+    }
+
+    // Check for luxvtId uniqueness if luxvtId is being updated
+    if (validatedData.luxvtId) {
+      const existingLuxvtAgent = await prisma.agent.findFirst({
+        where: {
+          luxvtId: validatedData.luxvtId,
+          id: { not: agentId }, // Exclude current agent
+        },
+      });
+
+      if (existingLuxvtAgent) {
+        return res.status(400).json({
+          error: "LuxVT ID is already taken by another agent",
         });
       }
     }
@@ -341,6 +358,22 @@ export const getAgentBySubdomain = async (req: Request, res: Response) => {
             },
           },
         },
+        luxvtListings: {
+          select: {
+            id: true,
+            listingId: true,
+            address: true,
+            photo: true,
+            website: true,
+            city: true,
+            state: true,
+            currency: true,
+            squareFeet: true,
+            unitOfMeasurement: true,
+            propertyName: true,
+            price: true,
+          },
+        },
       },
     });
 
@@ -370,6 +403,19 @@ export const getAgentBySubdomain = async (req: Request, res: Response) => {
       linkedInUrl: agent?.linkedInUrl,
       blogUrl: agent?.blogUrl,
       title: agent?.title,
+      
+      // LuxVT API fields
+      luxvtId: agent?.luxvtId,
+      city: agent?.city,
+      state: agent?.state,
+      country: agent?.country,
+      zip: agent?.zip,
+      license: agent?.license,
+      website: agent?.website,
+      isElite: agent?.isElite,
+      brokerage: agent?.brokerage,
+      agentGrade: agent?.agentGrade,
+      
       communities: agent?.communities,
       testimonials: agent?.testimonials,
       properties: publishedProperties,

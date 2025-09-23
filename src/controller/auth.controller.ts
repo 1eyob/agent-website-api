@@ -234,26 +234,10 @@ export const verifyOTP = async (req: Request, res: Response) => {
  * - hash_hmac('sha256', $email . '|' . $ts, $secret) for token validation
  */
 export const autoLogin = async (req: Request, res: Response) => {
-  console.log("🚀 AUTO LOGIN STARTED");
-  console.log("🌍 Server timezone info:", getServerTimezoneInfo());
-  console.log("📥 Request body:", req.body);
-  console.log("📥 Request query:", req.query);
-  console.log("📥 Request method:", req.method);
-
   try {
     const { email, ts, token: linkToken, entityid } = req.body;
-    console.log("📋 Extracted parameters:");
-    console.log("  - email:", email);
-    console.log("  - ts:", ts);
-    console.log("  - linkToken:", linkToken);
-    console.log("  - entityid:", entityid);
 
     if (!email || !ts || !linkToken || !entityid) {
-      console.log("❌ Missing required parameters");
-      console.log("  - email present:", !!email);
-      console.log("  - ts present:", !!ts);
-      console.log("  - linkToken present:", !!linkToken);
-      console.log("  - entityid present:", !!entityid);
       return res
         .status(400)
         .json({ error: "Invalid link - missing parameters" });
@@ -270,33 +254,6 @@ export const autoLogin = async (req: Request, res: Response) => {
     const linkTimestamp = parseInt(ts as string);
     const timeDifference = Math.abs(currentTime - linkTimestamp);
 
-    console.log("⏰ Timestamp validation (UTC timezone):");
-    console.log("  - server timezone: Etc/UTC (UTC, +0000)");
-    console.log("  - currentTime (UTC):", currentTime);
-    console.log(
-      "  - currentTime (readable):",
-      new Date(currentTime * 1000).toISOString()
-    );
-    console.log("  - linkTimestamp:", linkTimestamp);
-    console.log(
-      "  - linkTimestamp (readable):",
-      new Date(linkTimestamp * 1000).toISOString()
-    );
-    console.log("  - timeDifference:", timeDifference);
-    console.log("  - maxAllowed:", 300);
-    console.log("  - isValid:", timeDifference <= 300);
-
-    // Additional debugging for timezone issues
-    console.log("📊 DETAILED TIMING ANALYSIS:");
-    console.log("  - Date.now():", Date.now());
-    console.log(
-      "  - Math.floor(Date.now() / 1000):",
-      Math.floor(Date.now() / 1000)
-    );
-    console.log("  - new Date().getTime():", new Date().getTime());
-    console.log("  - new Date().toISOString():", new Date().toISOString());
-    console.log("  - process.env.TZ:", process.env.TZ || "not set");
-
     // Check if there's a parsing issue with the timestamp
     if (isNaN(linkTimestamp)) {
       console.log("  - ⚠️ WARNING: linkTimestamp is NaN! Raw ts value:", ts);
@@ -306,10 +263,6 @@ export const autoLogin = async (req: Request, res: Response) => {
     // TEMPORARY DEBUG: Extend expiry for debugging (remove in production)
     const DEBUG_EXTENDED_EXPIRY = 3600; // 1 hour for debugging
     const MAX_ALLOWED = 300; // Normal 5 minutes
-
-    console.log("🔧 DEBUG MODE: Extended expiry enabled for debugging");
-    console.log("  - Normal expiry:", MAX_ALLOWED, "seconds (5 minutes)");
-    console.log("  - Debug expiry:", DEBUG_EXTENDED_EXPIRY, "seconds (1 hour)");
 
     // if (timeDifference > DEBUG_EXTENDED_EXPIRY) {
     //   console.log("❌ LINK EXPIRED (even with extended debug time):");
@@ -410,18 +363,6 @@ export const autoLogin = async (req: Request, res: Response) => {
       where: { email: email as string },
     });
 
-    if (agent) {
-      console.log("✅ Found existing agent:");
-      console.log("  - id:", agent.id);
-      console.log("  - email:", agent.email);
-      console.log("  - fullName:", agent.fullName);
-      console.log("  - subdomain:", agent.subdomain);
-      console.log("  - entityId:", agent.entityId);
-      console.log("  - package_name:", agent.package_name);
-    } else {
-      console.log("❌ No existing agent found");
-    }
-
     // If agent exists but doesn't have entityId, update it
     if (agent && !agent.entityId) {
       console.log("🔄 Updating agent with entityId:", entityid);
@@ -453,7 +394,7 @@ export const autoLogin = async (req: Request, res: Response) => {
           email: email as string,
           fullName: fullName,
           subdomain: uniqueSubdomain,
-          package_name: "DETAILED" as const, // Default package
+          package_name: "BASIC" as const, // Default package
           entityId: entityid as string,
         };
         console.log("  - agentData:", agentData);
