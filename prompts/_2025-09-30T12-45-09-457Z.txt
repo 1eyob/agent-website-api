@@ -1,0 +1,143 @@
+Agent: Andres Ortiz
+Subdomain: 
+Generated: 9/30/2025, 3:45:09 PM
+
+=== ORIGINAL PROMPT ===
+Update the existing real estate agent website with the following changes:
+
+**Changes Required:**
+- Update hero background image to: https://images.unsplash.com/photo-1640109478916-f445f8f19b11?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4MDk0NjN8MHwxfHNlYXJjaHwzfHxsdXh1cnklMjByZWFsJTIwZXN0YXRlJTIwbW9kZXJuJTIwaG9tZXxlbnwwfDB8fHwxNzU5MTU5NzY4fDA&ixlib=rb-4.1.0&q=80&w=1080
+- Update featured properties with 2 listings
+
+**Updated Agent Information:**
+- Agent Name: Andres Ortiz
+- Professional Title: Elegran | Forbes Global Properties
+- Bio: The bio of an agent in the luxury network.
+- Contact: andres@luxvt.com, 619-746-2977
+
+**Updated Featured Properties:**
+1. Elegran Test 2 - DO NOT PROCESS - Elegran Test 2 - DO NOT PROCESS, San Diego, CA - USD 1,200,000 (Photo: https://www.luxvt.com/sites/default/files/images/203878/listing_images/2tourphoto070824122452.jpg)
+2. eXp Test Streettt 123 - eXp Test Streettt 123, San Diego, CA - USD 700,000 (Photo: https://www.luxvt.com/sites/default/files/images/23418/listing_images/5tourphoto122222134340.jpg)
+
+**Instructions:**
+- Maintain the existing website design and layout
+- Only update the specific information that has changed
+- Preserve the professional, modern, and luxurious aesthetic
+- Ensure all changes are reflected across all relevant sections
+- Keep the color scheme and branding consistent
+- Update meta tags and SEO information if contact details changed
+
+
+=== ENHANCED PROMPT ===
+**Real Estate Agent Website Update:**
+
+**Objective:**
+Revise the existing website to enhance its presentation with up-to-date content while retaining its modern, professional, and luxurious appeal.
+
+**Key Updates:**
+
+1. **Hero Section:**
+   - Replace the background image with the new luxury real estate photo:
+     [Hero Image](https://images.unsplash.com/photo-1640109478916-f445f8f19b11?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4MDk0NjN8MHwxfHNlYXJjaHwzfHxsdXh1cnklMjByZWFsJTIwZXN0YXRlJTIwbW9kZXJuJTIwaG9tZXxlbnwwfDB8fHwxNzU5MTU5NzY4fDA&ixlib=rb-4.1.0&q=80&w=1080)
+
+2. **Agent Profile:**
+   - Name: Andres Ortiz
+   - Title: Elegran | Forbes Global Properties
+   - Bio: Highlight Andres's expertise in the luxury network.
+   - Contact Information:
+     - Email: andres@luxvt.com
+     - Phone: 619-746-2977
+
+3. **Featured Properties:**
+   - **Property 1:** 
+     - Title: Elegran Test 2 - DO NOT PROCESS
+     - Location: San Diego, CA
+     - Price: USD 1,200,000
+     - Image: [Property 1 Image](https://www.luxvt.com/sites/default/files/images/203878/listing_images/2tourphoto070824122452.jpg)
+   
+   - **Property 2:**
+     - Title: eXp Test Streettt 123
+     - Location: San Diego, CA
+     - Price: USD 700,000
+     - Image: [Property 2 Image](https://www.luxvt.com/sites/default/files/images/23418/listing_images/5tourphoto122222134340.jpg)
+
+**Implementation Instructions:**
+
+- Maintain the current design elements to ensure consistency with the current brand aesthetic.
+- Only adjust sections where information has been updated.
+- Ensure all details are synchronized across all pages, such as contact info and property details.
+- Double-check the integration of updated contact details in meta tags and SEO settings.
+- Confirm that updated images are optimized for web use to maintain fast load times.
+- Review all changes to guarantee they align with the existing color scheme and branding guidelines.
+
+These updates will keep the website fresh and appealing while effectively communicating Andres Ortiz’s professional credentials and newly featured properties.
+
+=== AGENT DATA ===
+{
+  "fullName": "Andres Ortiz",
+  "title": "Elegran | Forbes Global Properties",
+  "bio": "The bio of an agent in the luxury network.",
+  "phone": "619-746-2977",
+  "email": "andres@luxvt.com",
+  "profilePhoto": "http://localhost:5001/uploads/agents/profilePhoto-1759158335991-832674973.jpeg",
+  "heroImage": "https://images.unsplash.com/photo-1640109478916-f445f8f19b11?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4MDk0NjN8MHwxfHNlYXJjaHwzfHxsdXh1cnklMjByZWFsJTIwZXN0YXRlJTIwbW9kZXJuJTIwaG9tZXxlbnwwfDB8fHwxNzU5MTU5NzY4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "logo": "http://localhost:5001/uploads/agents/logo-1758794279641-814906138.png",
+  "instagramUrl": "https://instagram.com/eyoba",
+  "facebookUrl": "https://facebook.com/eyoba",
+  "linkedInUrl": "https://www.linkedin.com/in/eyob-birhanu/",
+  "twitterUrl": "https://x.com/eyoba",
+  "testimonials": [
+    {
+      "id": "dd7f64b5-df03-4a6f-8189-a9ba9ff59bfd",
+      "name": "John Smith",
+      "content": "He is a good boy"
+    }
+  ],
+  "communities": [
+    {
+      "id": "90689ab4-6686-454c-a96a-e1d1a860dc56",
+      "name": "Bevery Hills",
+      "description": "This the a great community in LA",
+      "photo": "http://localhost:5001/uploads/communities/photo-1758744069666-456998848.jpg",
+      "link": "https://grok.com/c/050dbefc-4528-40ad-bd96-98467c33ae11",
+      "highlights": [],
+      "homeStyles": []
+    }
+  ],
+  "listings": [
+    {
+      "id": "94e66990-00cf-414f-9c36-839a2061a626",
+      "listingId": "203878",
+      "address": "Elegran Test 2 - DO NOT PROCESS",
+      "photo": "https://www.luxvt.com/sites/default/files/images/203878/listing_images/2tourphoto070824122452.jpg",
+      "website": "http://elegrantest2-donotprocess.vt-lux.com",
+      "city": "San Diego",
+      "state": "CA",
+      "currency": "USD",
+      "squareFeet": "3456",
+      "unitOfMeasurement": "sqft",
+      "propertyName": "Elegran Test 2 - DO NOT PROCESS",
+      "price": "1,200,000",
+      "agentId": "8e9ae452-06b3-4047-b4aa-a89c1a47f4ae",
+      "createdAt": "2025-09-20T14:02:48.031Z",
+      "updatedAt": "2025-09-30T12:22:57.398Z"
+    },
+    {
+      "id": "56d08942-e645-4910-bace-2daebe8c6bc1",
+      "listingId": "23418",
+      "address": "eXp Test Streettt 123",
+      "photo": "https://www.luxvt.com/sites/default/files/images/23418/listing_images/5tourphoto122222134340.jpg",
+      "website": "http://expteststreettt123.vt-lux.com",
+      "city": "San Diego",
+      "state": "CA",
+      "currency": "USD",
+      "squareFeet": "4000",
+      "unitOfMeasurement": "sqft",
+      "propertyName": "eXp Test Streettt 123",
+      "price": "700,000",
+      "agentId": "8e9ae452-06b3-4047-b4aa-a89c1a47f4ae",
+      "createdAt": "2025-09-20T14:02:48.052Z",
+      "updatedAt": "2025-09-30T12:22:57.413Z"
+    }
+  ]
+}

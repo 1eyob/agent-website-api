@@ -1,0 +1,266 @@
+Agent: Andres Ortiz
+Subdomain: andres
+Generated: 9/30/2025, 1:11:54 PM
+
+=== ORIGINAL PROMPT ===
+Create a professional, modern, and luxurious real estate agent website with the following specifications:
+
+**Agent Information:**
+- Agent Name: Andres Ortiz
+- Professional Title: Elegran | Forbes Global Properties
+- Bio: The bio of an agent in the luxury network.
+- Contact: andres@luxvt.com, 619-746-2977
+
+**Design Requirements:**
+- Modern, clean, and luxurious design aesthetic
+- Responsive design that works on mobile, tablet, and desktop
+- Use a professional color scheme with gold/champagne accents (similar to #b19a55)
+- Include smooth animations and transitions
+- Professional typography with clear hierarchy
+
+**Website Sections:**
+
+1. **Hero Section**
+   - Full-width hero with background image (use image from URL: https://images.unsplash.com/photo-1644340416937-3b35132e7590?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4MDk0NjN8MHwxfHNlYXJjaHw5fHxjaXR5JTIwc2t5bGluZSUyMGJ1aWxkaW5nc3xlbnwwfDB8fHwxNzU4OTcwMzc2fDA&ixlib=rb-4.1.0&q=80&w=1080)
+   - Agent name and title prominently displayed
+   - Call-to-action button "Contact Me"
+   - Company/Agent logo in header (URL: https://api.expagentsite.com/uploads/agents/logo-1758794279641-814906138.png)
+
+2. **About Section**
+   - Agent biography: The bio of an agent in the luxury network.
+   - Professional headshot photo (URL: https://api.expagentsite.com/uploads/agents/profilePhoto-1759158335991-832674973.jpeg)
+   - Highlight expertise in luxury real estate
+
+3. **Contact Section**
+   - Email: andres@luxvt.com
+   - Phone: 619-746-2977
+   - Contact form with fields: Name, Email, Phone, Message
+   - Google Maps integration (placeholder for now)
+
+4. **Social Media Links**
+   - Instagram: https://instagram.com/eyoba
+   - Facebook: https://facebook.com/eyoba
+   - LinkedIn: https://www.linkedin.com/in/eyob-birhanu/
+   - Twitter: https://x.com/eyoba
+
+5. **Testimonials Section**
+   Display client testimonials in a carousel or grid:
+   
+   Testimonial 1:
+   - Client: John Smith
+   - Quote: "He is a good boy"
+
+6. **Communities/Neighborhoods Section**
+   Showcase the areas served:
+
+   Community 1:
+   - Name: Bevery Hills
+   - Description: This the a great community in LA
+   
+   
+   - Photo URL: https://api.expagentsite.com/uploads/communities/photo-1758744069666-456998848.jpg
+   - External Link: https://grok.com/c/050dbefc-4528-40ad-bd96-98467c33ae11
+
+7. **Featured Properties Section**
+   Display luxury listings in a grid or carousel:
+
+   Property 1:
+   - Name: Elegran Test 2 - DO NOT PROCESS
+   - Address: Elegran Test 2 - DO NOT PROCESS, San Diego, CA
+   - Price: USD 1,200,000
+   - Size: 3456 sqft
+   - Photo URL: https://www.luxvt.com/sites/default/files/images/203878/listing_images/2tourphoto070824122452.jpg
+   - Virtual Tour Link: http://elegrantest2-donotprocess.vt-lux.com
+
+   Property 2:
+   - Name: eXp Test Streettt 123
+   - Address: eXp Test Streettt 123, San Diego, CA
+   - Price: USD 700,000
+   - Size: 4000 sqft
+   - Photo URL: https://www.luxvt.com/sites/default/files/images/23418/listing_images/5tourphoto122222134340.jpg
+   - Virtual Tour Link: http://expteststreettt123.vt-lux.com
+
+**Additional Requirements:**
+- Include a sticky navigation bar with smooth scroll to sections
+- Add a footer with copyright, social links, and contact info
+- Implement a mobile-friendly hamburger menu
+- Use modern web technologies (React, TypeScript, Tailwind CSS)
+- Ensure accessibility (ARIA labels, semantic HTML)
+- Optimize images for web performance
+- Include meta tags for SEO (title, description, Open Graph)
+- Make all external links open in new tabs
+- Add hover effects on interactive elements
+- Implement a "Back to Top" button
+
+**Color Palette Suggestion:**
+- Primary: #b19a55 (Gold/Champagne)
+- Secondary: #2c3e50 (Dark Blue/Gray)
+- Background: #ffffff (White)
+- Text: #333333 (Dark Gray)
+- Accents: #f8f9fa (Light Gray)
+
+**Typography:**
+- Headings: Modern serif or elegant sans-serif
+- Body: Clean, readable sans-serif
+- Professional and luxurious feel
+
+Please create a complete, production-ready website based on these specifications.
+
+=== ENHANCED PROMPT ===
+### Project Brief: Luxe Real Estate Agent Website for Andres Ortiz
+
+Design and develop a sophisticated, responsive website for Andres Ortiz, an esteemed real estate agent with Elegran | Forbes Global Properties. The website should exude luxury, professionalism, and a modern aesthetic, highlighting Andres's expertise in the luxury real estate market.
+
+#### **Agent Information:**
+- **Name:** Andres Ortiz
+- **Title:** Elegran | Forbes Global Properties
+- **Bio:** Exemplary agent in the luxury network.
+- **Contact:** andres@luxvt.com | 619-746-2977
+
+#### **Design Specifications:**
+- Artistry in Modern, Clean, and Luxurious design
+- Fluid responsiveness for mobile, tablet, and desktop
+- Professional color palette incorporating gold/champagne accents (#b19a55)
+- Smooth animations and transitions for an elegant experience
+- Clear typographic hierarchy using professional typefaces
+
+#### **Website Layout:**
+
+1. **Hero Section**
+   - Engaging full-width image [Image Link](https://images.unsplash.com/photo-1644340416937-3b35132e7590?&ixlib=rb-4.1.0&q=80&w=1080)
+   - Prominent display of Andres's name and title
+   - Eye-catching "Contact Me" call-to-action button
+   - Display company/agent logo [Logo Link](https://api.expagentsite.com/uploads/agents/logo-1758794279641-814906138.png) 
+
+2. **About Section**
+   - Compelling biography showcasing luxury real estate expertise
+   - Showcase a professional headshot [Photo Link](https://api.expagentsite.com/uploads/agents/profilePhoto-1759158335991-832674973.jpeg)
+
+3. **Contact Section**
+   - List Contact Details: Email and Phone
+   - Integrate a simple contact form with fields: Name, Email, Phone, Message
+   - Embed a placeholder for Google Maps
+
+4. **Social Media Icons**
+   - Include links to social media profiles: 
+     - [Instagram](https://instagram.com/eyoba)
+     - [Facebook](https://facebook.com/eyoba)
+     - [LinkedIn](https://www.linkedin.com/in/eyob-birhanu/)
+     - [Twitter](https://x.com/eyoba)
+
+5. **Testimonials Section**
+   - Utilize a carousel to feature client testimonials:
+     - **John Smith:** "He is a good boy"
+
+6. **Communities/Neighborhoods Section**
+   - Feature areas with photos and descriptions:
+     - **Beverly Hills:** "This is a great community in LA"
+     - [Community Photo Link](https://api.expagentsite.com/uploads/communities/photo-1758744069666-456998848.jpg)
+     - [External Link](https://grok.com/c/050dbefc-4528-40ad-bd96-98467c33ae11)
+
+7. **Featured Properties Section**
+   - Display properties with grid/carousel:
+     - **Property 1:** 
+       - Name: Elegran Test 2 - DO NOT PROCESS
+       - Price: $1,200,000, 3456 sqft
+       - [Photo Link](https://www.luxvt.com/sites/default/files/images/203878/listing_images/2tourphoto070824122452.jpg)
+       - [Virtual Tour](http://elegrantest2-donotprocess.vt-lux.com)
+     - **Property 2:** 
+       - Name: eXp Test Streettt 123
+       - Price: $700,000, 4000 sqft
+       - [Photo Link](https://www.luxvt.com/sites/default/files/images/23418/listing_images/5tourphoto122222134340.jpg)
+       - [Virtual Tour](http://expteststreettt123.vt-lux.com)
+
+#### **Technical Specifications:**
+- Implement a sticky navigation bar with smooth scrolling
+- Include a footer with legal and social links
+- Mobile-friendly hamburger menu
+- Use React, TypeScript, and Tailwind CSS
+- Ensure high accessibility standards (ARIA labels, semantic HTML)
+- Optimize images for quick loading
+- Add SEO-friendly meta tags with Open Graph protocols
+- All external links open in new tabs
+- Add hover effects on interactive components
+- Include a "Back to Top" button
+
+#### **Color and Typography:**
+- **Primary:** #b19a55 (Gold/Champagne)
+- **Secondary:** #2c3e50 (Dark Blue/Gray)
+- **Background:** #ffffff (White)
+- **Text:** #333333 (Dark Gray)
+- **Accents:** #f8f9fa (Light Gray)
+
+- **Headings:** Modern serif or elegant sans-serif
+- **Body:** Clean and highly readable sans-serif
+
+Develop a complete, cutting-edge website tailored to the luxurious brand of Andres Ortiz. The final product should be ready for production, emphasizing elegance and sophistication suitable for a high-end real estate market.
+
+=== AGENT DATA ===
+{
+  "fullName": "Andres Ortiz",
+  "title": "Elegran | Forbes Global Properties",
+  "bio": "The bio of an agent in the luxury network.",
+  "phone": "619-746-2977",
+  "email": "andres@luxvt.com",
+  "profilePhoto": "https://api.expagentsite.com/uploads/agents/profilePhoto-1759158335991-832674973.jpeg",
+  "heroImage": "https://images.unsplash.com/photo-1644340416937-3b35132e7590?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4MDk0NjN8MHwxfHNlYXJjaHw5fHxjaXR5JTIwc2t5bGluZSUyMGJ1aWxkaW5nc3xlbnwwfDB8fHwxNzU4OTcwMzc2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "logo": "https://api.expagentsite.com/uploads/agents/logo-1758794279641-814906138.png",
+  "instagramUrl": "https://instagram.com/eyoba",
+  "facebookUrl": "https://facebook.com/eyoba",
+  "linkedInUrl": "https://www.linkedin.com/in/eyob-birhanu/",
+  "twitterUrl": "https://x.com/eyoba",
+  "testimonials": [
+    {
+      "id": "dd7f64b5-df03-4a6f-8189-a9ba9ff59bfd",
+      "name": "John Smith",
+      "content": "He is a good boy"
+    }
+  ],
+  "communities": [
+    {
+      "id": "90689ab4-6686-454c-a96a-e1d1a860dc56",
+      "name": "Bevery Hills",
+      "description": "This the a great community in LA",
+      "photo": "https://api.expagentsite.com/uploads/communities/photo-1758744069666-456998848.jpg",
+      "link": "https://grok.com/c/050dbefc-4528-40ad-bd96-98467c33ae11",
+      "highlights": [],
+      "homeStyles": []
+    }
+  ],
+  "listings": [
+    {
+      "id": "94e66990-00cf-414f-9c36-839a2061a626",
+      "listingId": "203878",
+      "address": "Elegran Test 2 - DO NOT PROCESS",
+      "photo": "https://www.luxvt.com/sites/default/files/images/203878/listing_images/2tourphoto070824122452.jpg",
+      "website": "http://elegrantest2-donotprocess.vt-lux.com",
+      "city": "San Diego",
+      "state": "CA",
+      "currency": "USD",
+      "squareFeet": "3456",
+      "unitOfMeasurement": "sqft",
+      "propertyName": "Elegran Test 2 - DO NOT PROCESS",
+      "price": "1,200,000",
+      "agentId": "8e9ae452-06b3-4047-b4aa-a89c1a47f4ae",
+      "createdAt": "2025-09-20T14:02:48.031Z",
+      "updatedAt": "2025-09-30T09:52:21.045Z"
+    },
+    {
+      "id": "56d08942-e645-4910-bace-2daebe8c6bc1",
+      "listingId": "23418",
+      "address": "eXp Test Streettt 123",
+      "photo": "https://www.luxvt.com/sites/default/files/images/23418/listing_images/5tourphoto122222134340.jpg",
+      "website": "http://expteststreettt123.vt-lux.com",
+      "city": "San Diego",
+      "state": "CA",
+      "currency": "USD",
+      "squareFeet": "4000",
+      "unitOfMeasurement": "sqft",
+      "propertyName": "eXp Test Streettt 123",
+      "price": "700,000",
+      "agentId": "8e9ae452-06b3-4047-b4aa-a89c1a47f4ae",
+      "createdAt": "2025-09-20T14:02:48.052Z",
+      "updatedAt": "2025-09-30T09:52:21.058Z"
+    }
+  ]
+}

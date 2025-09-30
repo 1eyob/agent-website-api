@@ -58,12 +58,13 @@ model Agent {
   properties    Property[]
   luxvtListings LuxvtListing[]
 
-  published         Boolean            @default(false)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  ContactRequest    ContactRequest[]
-  conciergeRequests ConciergeRequest[]
-  package_name      AgentPackage?
+  published             Boolean                @default(false)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  ContactRequest        ContactRequest[]
+  conciergeRequests     ConciergeRequest[]
+  package_name          AgentPackage?
+  websiteGenerationJobs WebsiteGenerationJob[]
 }
 
 model Community {
@@ -228,4 +229,26 @@ model LuxvtListing {
 
   // Compound unique constraint to allow same listingId for different agents
   @@unique([listingId, agentId], name: "listingId_agentId")
+}
+
+model WebsiteGenerationJob {
+  id        String                  @id @default(cuid())
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
+  agentId   String
+  subdomain String
+  prompt    String                  @db.Text // Enhanced prompt for Lovable
+  agentData String?                 @db.Text // JSON string of agent data
+  status    WebsiteGenerationStatus @default(PENDING)
+
+  // Agent relationship
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+}
+
+enum WebsiteGenerationStatus {
+  PENDING // Job created, awaiting processing
+  IN_PROGRESS // Website generation in progress
+  COMPLETED // Website successfully generated
+  FAILED // Generation failed
+  CANCELLED // Job cancelled
 }

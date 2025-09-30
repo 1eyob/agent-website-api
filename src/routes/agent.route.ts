@@ -4,6 +4,7 @@ import {
   getAgent,
   updateAgent,
   getAgentBySubdomain,
+  generateWebsite,
 } from "../controller/agent.controller";
 import { authenticateAgent } from "../middleware/auth.middleware";
 import { uploadAgentAssets } from "../middleware/upload.middleware";
@@ -20,5 +21,6 @@ router.use(authenticateAgent as RequestHandler);
 router.post("/", uploadAgentAssets, createAgent as RequestHandler);
 router.get("/me", getAgent as RequestHandler);
 router.patch("/profile", uploadAgentAssets, updateAgent as RequestHandler);
+router.post("/generate-website", generateWebsite as RequestHandler);
 
 export default router;

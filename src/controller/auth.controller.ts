@@ -246,7 +246,6 @@ export const autoLogin = async (req: Request, res: Response) => {
     // Get secret from environment variable
     const SECRET =
       process.env.AUTO_LOGIN_SECRET || "a384b6463fc216a5f8ecb6670f86456a";
-    console.log("🔐 Using SECRET:", SECRET.substring(0, 8) + "...");
 
     // 1. Check timestamp validity (5 min window) - matches PHP logic
     // Server timezone: Etc/UTC (UTC, +0000) - matches PHP time() function
@@ -264,86 +263,13 @@ export const autoLogin = async (req: Request, res: Response) => {
     const DEBUG_EXTENDED_EXPIRY = 3600; // 1 hour for debugging
     const MAX_ALLOWED = 300; // Normal 5 minutes
 
-    // if (timeDifference > DEBUG_EXTENDED_EXPIRY) {
-    //   console.log("❌ LINK EXPIRED (even with extended debug time):");
-    //   console.log("  - Current time (UTC):", currentTime);
-    //   console.log("  - Link timestamp:", linkTimestamp);
-    //   console.log("  - Time difference:", timeDifference, "seconds");
-    //   console.log(
-    //     "  - Debug max allowed:",
-    //     DEBUG_EXTENDED_EXPIRY,
-    //     "seconds (1 hour)"
-    //   );
-    //   console.log(
-    //     "  - Link is",
-    //     timeDifference - DEBUG_EXTENDED_EXPIRY,
-    //     "seconds too old"
-    //   );
-    //   console.log(
-    //     "  - Link was created at:",
-    //     new Date(linkTimestamp * 1000).toISOString()
-    //   );
-    //   console.log(
-    //     "  - Current time is:",
-    //     new Date(currentTime * 1000).toISOString()
-    //   );
-    //   console.log(
-    //     "  - Link age:",
-    //     Math.floor(timeDifference / 60),
-    //     "minutes",
-    //     timeDifference % 60,
-    //     "seconds"
-    //   );
-
-    //   return res.status(400).json({
-    //     error: "Link expired (even with debug extension)",
-    //     debug: {
-    //       currentTime,
-    //       linkTimestamp,
-    //       timeDifference,
-    //       normalExpiry: MAX_ALLOWED,
-    //       debugExpiry: DEBUG_EXTENDED_EXPIRY,
-    //       linkAge: `${Math.floor(timeDifference / 60)}m ${
-    //         timeDifference % 60
-    //       }s`,
-    //     },
-    //   });
-    // }
-
-    // if (timeDifference > MAX_ALLOWED) {
-    //   console.log("⚠️ WOULD NORMALLY BE EXPIRED (but allowing for debug):");
-    //   console.log("  - Time difference:", timeDifference, "seconds");
-    //   console.log(
-    //     "  - Normal max allowed:",
-    //     MAX_ALLOWED,
-    //     "seconds (5 minutes)"
-    //   );
-    //   console.log(
-    //     "  - Link is",
-    //     timeDifference - MAX_ALLOWED,
-    //     "seconds past normal expiry"
-    //   );
-    //   console.log("  - But allowing due to debug mode");
-    // }
-    // console.log(
-    //   "✅ Timestamp is valid - link is",
-    //   timeDifference,
-    //   "seconds old"
-    // );
-
     // 2. Verify token - matches PHP logic with pipe separator
     const hashData = `${email}|${ts}`;
-    console.log("🔒 Token validation:");
-    console.log("  - hashData:", hashData);
-    console.log("  - received linkToken:", linkToken);
 
     const validHash = crypto
       .createHmac("sha256", SECRET)
       .update(hashData)
       .digest("hex");
-
-    console.log("  - computed validHash:", validHash);
-    console.log("  - tokens match:", String(linkToken) === validHash);
 
     // Use secure comparison to prevent timing attacks
     if (
@@ -355,10 +281,8 @@ export const autoLogin = async (req: Request, res: Response) => {
       console.log("❌ Token validation failed");
       return res.status(403).json({ error: "Invalid token" });
     }
-    console.log("✅ Token is valid");
 
     // Try to find existing agent first
-    console.log("👤 Looking for existing agent with email:", email);
     let agent = await prisma.agent.findUnique({
       where: { email: email as string },
     });
@@ -379,17 +303,13 @@ export const autoLogin = async (req: Request, res: Response) => {
       try {
         // Extract fullName and subdomain from email
         const { fullName, subdomain } = extractFromEmail(email as string);
-        console.log("📧 Extracted from email:");
-        console.log("  - fullName:", fullName);
-        console.log("  - base subdomain:", subdomain);
 
         // Generate a unique subdomain if the extracted one is taken
-        console.log("🔍 Generating unique subdomain...");
+
         const uniqueSubdomain = await generateUniqueSubdomain(subdomain);
-        console.log("  - unique subdomain:", uniqueSubdomain);
 
         // Create new agent
-        console.log("💾 Creating agent with data:");
+
         const agentData = {
           email: email as string,
           fullName: fullName,
@@ -402,23 +322,11 @@ export const autoLogin = async (req: Request, res: Response) => {
         agent = await prisma.agent.create({
           data: agentData,
         });
-
-        console.log("✅ New agent created successfully:");
-        console.log("  - id:", agent.id);
-        console.log("  - email:", agent.email);
-        console.log("  - fullName:", agent.fullName);
-        console.log("  - subdomain:", agent.subdomain);
-        console.log("  - entityId:", agent.entityId);
       } catch (createError: any) {
         console.log("❌ Error creating agent:", createError);
-        console.log("  - error code:", createError.code);
-        console.log("  - error message:", createError.message);
 
         // If email already exists, try to find by email instead
         if (createError.code === "P2002") {
-          console.log(
-            "🔄 Duplicate key error, trying to find existing agent..."
-          );
           agent = await prisma.agent.findUnique({
             where: { email: email as string },
           });
@@ -439,20 +347,7 @@ export const autoLogin = async (req: Request, res: Response) => {
       }
     }
 
-    // At this point, agent should always exist (either found or created)
-    console.log("🎯 Final agent object:");
-    console.log("  - id:", agent.id);
-    console.log("  - email:", agent.email);
-    console.log("  - fullName:", agent.fullName);
-    console.log("  - subdomain:", agent.subdomain);
-    console.log("  - entityId:", agent.entityId);
-    console.log("  - package_name:", agent.package_name);
-    console.log("  - createdAt:", agent.createdAt);
-
-    // Generate JWT token for the authenticated user
-    console.log("🔑 Generating JWT token...");
     const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
-    console.log("  - JWT_SECRET:", JWT_SECRET.substring(0, 8) + "...");
 
     const tokenPayload = {
       id: agent.id,
@@ -468,10 +363,6 @@ export const autoLogin = async (req: Request, res: Response) => {
       ? "Agent registered and logged in successfully"
       : "Auto login successful";
 
-    console.log("📤 Preparing response:");
-    console.log("  - isNewlyCreated:", isNewlyCreated);
-    console.log("  - message:", message);
-
     const responseData = {
       message,
       token,
@@ -485,15 +376,8 @@ export const autoLogin = async (req: Request, res: Response) => {
       },
     };
 
-    console.log("  - responseData:", responseData);
-    console.log("✅ AUTO LOGIN COMPLETED SUCCESSFULLY");
-
     res.status(200).json(responseData);
   } catch (error: any) {
-    console.error("💥 AUTO LOGIN ERROR:", error);
-    console.error("  - error name:", error?.name);
-    console.error("  - error message:", error?.message);
-    console.error("  - error stack:", error?.stack);
     res.status(500).json({ error: "Internal server error" });
   }
 };

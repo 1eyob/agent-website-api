@@ -7,8 +7,20 @@ import {
   updateTestimonialSchema,
 } from "../validations/agent.validation";
 import { z } from "zod";
+import OpenAI from "openai";
+import dotenv from "dotenv";
+import fs from "fs";
+import path from "path";
+
+dotenv.config();
 
 const prisma = new PrismaClient();
+
+const openai = new OpenAI({
+  apiKey:
+    process.env.OPENAI_API_KEY ||
+    "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",
+});
 
 const updateAgentSchema = createAgentSchema.partial();
 
@@ -403,7 +415,7 @@ export const getAgentBySubdomain = async (req: Request, res: Response) => {
       linkedInUrl: agent?.linkedInUrl,
       blogUrl: agent?.blogUrl,
       title: agent?.title,
-      
+
       // LuxVT API fields
       luxvtId: agent?.luxvtId,
       city: agent?.city,
@@ -415,7 +427,7 @@ export const getAgentBySubdomain = async (req: Request, res: Response) => {
       isElite: agent?.isElite,
       brokerage: agent?.brokerage,
       agentGrade: agent?.agentGrade,
-      
+
       communities: agent?.communities,
       testimonials: agent?.testimonials,
       properties: publishedProperties,
@@ -425,5 +437,107 @@ export const getAgentBySubdomain = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Get agent by subdomain error:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// POST /api/v1/agent/generate-website
+export const generateWebsite = async (req: Request, res: Response) => {
+  try {
+    const { subdomain, prompt, agentData } = req.body;
+    const agentId = (req as any).agent?.id; // from auth middleware
+
+    if (!agentId) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt is required" });
+    }
+
+    // Step 1: Optionally enhance/refine the prompt using OpenAI
+    const refinedPrompt = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an expert at creating prompts for website builders. Refine and optimize the following prompt to create a stunning real estate agent website.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    });
+
+    const enhancedPrompt = refinedPrompt.choices[0].message.content;
+
+    if (!enhancedPrompt) {
+      return res.status(500).json({ error: "Failed to generate prompt" });
+    }
+
+    // Step 2: Save the enhanced prompt to a file
+    const promptsDir = path.join(__dirname, "../../prompts");
+
+    // Create prompts directory if it doesn't exist
+    if (!fs.existsSync(promptsDir)) {
+      fs.mkdirSync(promptsDir, { recursive: true });
+    }
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const filename = `${subdomain}_${timestamp}.txt`;
+    const filepath = path.join(promptsDir, filename);
+
+    // Create file content with metadata
+    const fileContent = `Agent: ${agentData?.fullName || "Unknown"}
+Subdomain: ${subdomain}
+Generated: ${new Date().toLocaleString()}
+
+=== ORIGINAL PROMPT ===
+${prompt}
+
+=== ENHANCED PROMPT ===
+${enhancedPrompt}
+
+=== AGENT DATA ===
+${agentData ? JSON.stringify(agentData, null, 2) : "No agent data provided"}
+`;
+
+    fs.writeFileSync(filepath, fileContent, "utf-8");
+    console.log(`Prompt saved to: ${filepath}`);
+
+    // Step 3: Send to Lovable API (or manually create the site)
+    // Note: Lovable might not have a public API yet
+    // You might need to:
+    // - Use their CLI programmatically
+    // - Manually create projects
+    // - Or use a different website builder with an API
+
+    // For now, save the prompt and mark for manual processing
+    await prisma.websiteGenerationJob.create({
+      data: {
+        agentId,
+        subdomain,
+        prompt: enhancedPrompt,
+        agentData: agentData ? JSON.stringify(agentData) : null,
+        status: "PENDING",
+      },
+    });
+
+    // Update agent's subdomain
+    await prisma.agent.update({
+      where: { id: agentId },
+      data: { subdomain },
+    });
+
+    res.json({
+      success: true,
+      message: "Website generation initiated",
+      subdomain,
+      promptFile: filename,
+    });
+  } catch (error: any) {
+    console.error("Error generating website:", error);
+    res.status(500).json({ error: "Failed to generate website" });
   }
 };
