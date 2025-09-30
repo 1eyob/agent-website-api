@@ -518,6 +518,7 @@ ${agentData ? JSON.stringify(agentData, null, 2) : "No agent data provided"}
       data: {
         agentId,
         subdomain,
+        rawPrompt: prompt,
         prompt: enhancedPrompt,
         agentData: agentData ? JSON.stringify(agentData) : null,
         status: "PENDING",

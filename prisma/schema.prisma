@@ -237,6 +237,7 @@ model WebsiteGenerationJob {
   updatedAt DateTime                @updatedAt
   agentId   String
   subdomain String
+  rawPrompt String?                 @db.Text // Original prompt from user
   prompt    String                  @db.Text // Enhanced prompt for Lovable
   agentData String?                 @db.Text // JSON string of agent data
   status    WebsiteGenerationStatus @default(PENDING)
