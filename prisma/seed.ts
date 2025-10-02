@@ -166,6 +166,27 @@ async function main() {
     },
   });
 
+  // Generate a unique subdomain for Morgan
+  const morganBaseSubdomain = "morgan";
+  const morganUniqueSubdomain = await generateUniqueSubdomain(
+    morganBaseSubdomain
+  );
+
+  // Create Morgan's agent profile
+  const morganAgent = await prisma.agent.upsert({
+    where: { email: "morgan@luxvt.com" },
+    update: {
+      subdomain: morganUniqueSubdomain,
+    },
+    create: {
+      email: "morgan@luxvt.com",
+      fullName: "Morgan",
+      subdomain: morganUniqueSubdomain,
+      phone: "+1234567890",
+      bio: "Admin",
+    },
+  });
+
   console.log({
     agent,
     ericAgent,
@@ -173,6 +194,7 @@ async function main() {
     charlesLuxvtAgent,
     eyobTadesseAgent,
     jijoMavilaAgent,
+    morganAgent,
   });
 }
 
