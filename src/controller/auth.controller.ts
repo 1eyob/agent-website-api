@@ -3,6 +3,7 @@ import { sendOTPEmail } from "../utils/email";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -425,4 +426,69 @@ export const generateAutoLoginLink = (
   console.log("✅ Auto login link generated successfully");
 
   return url;
+};
+
+// Password-based login
+export const passwordLogin = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
+
+    // Find agent by email
+    const agent = await prisma.agent.findUnique({
+      where: { email },
+    });
+
+    if (!agent) {
+      return res.status(404).json({ error: "Agent not found" });
+    }
+
+    // Check if agent has a password set
+    if (!agent.password) {
+      return res.status(400).json({
+        error:
+          "Password not set for this account. Please use OTP login or contact support.",
+      });
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, agent.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Invalid password" });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        id: agent.id,
+        email: agent.email,
+      },
+      process.env.JWT_SECRET || "your-secret-key",
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      agent: {
+        id: agent.id,
+        email: agent.email,
+        fullName: agent.fullName,
+        subdomain: agent.subdomain,
+        package_name: agent.package_name,
+      },
+    });
+  } catch (error) {
+    console.error("Password login error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Helper function to hash passwords
+export const hashPassword = async (password: string): Promise<string> => {
+  const saltRounds = 12;
+  return await bcrypt.hash(password, saltRounds);
 };

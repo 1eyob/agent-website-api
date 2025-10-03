@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -44,6 +45,11 @@ async function generateUniqueSubdomain(baseSubdomain: string): Promise<string> {
 }
 
 async function main() {
+  // Hash a default password for all test agents
+  // Default password: "password123" - use this for testing password login
+  const defaultPassword = "password123";
+  const hashedPassword = await bcrypt.hash(defaultPassword, 12);
+
   // Generate a unique subdomain
   const baseSubdomain = "eyobbirhanu";
   const uniqueSubdomain = await generateUniqueSubdomain(baseSubdomain);
@@ -53,6 +59,7 @@ async function main() {
     where: { email: process.env.EMAIL_USER || "eyobbirhanu28@gmail.com" },
     update: {
       subdomain: uniqueSubdomain, // Update subdomain if it's a new unique one
+      password: hashedPassword, // Add password to existing agent
     },
     create: {
       email: process.env.EMAIL_USER || "eyobbirhanu28@gmail.com",
@@ -60,6 +67,7 @@ async function main() {
       subdomain: uniqueSubdomain,
       phone: "1234567890",
       bio: "I am a real estate agent",
+      password: hashedPassword,
     },
   });
 
@@ -72,6 +80,7 @@ async function main() {
     where: { email: "eric@luxvt.com" },
     update: {
       subdomain: ericUniqueSubdomain,
+      password: hashedPassword,
     },
     create: {
       email: "eric@luxvt.com",
@@ -79,6 +88,7 @@ async function main() {
       subdomain: ericUniqueSubdomain,
       phone: "+1345678896",
       bio: "I am a legal luxvt agent",
+      password: hashedPassword,
     },
   });
 
@@ -93,6 +103,7 @@ async function main() {
     where: { email: "charles@airdomo.com" },
     update: {
       subdomain: charlesUniqueSubdomain,
+      password: hashedPassword,
     },
     create: {
       email: "charles@airdomo.com",
@@ -100,6 +111,7 @@ async function main() {
       subdomain: charlesUniqueSubdomain,
       phone: "+1234567890",
       bio: "I am a real estate agent",
+      password: hashedPassword,
     },
   });
 
@@ -114,6 +126,7 @@ async function main() {
     where: { email: "charles@luxvt.com" },
     update: {
       subdomain: charlesLuxvtUniqueSubdomain,
+      password: hashedPassword,
     },
     create: {
       email: "charles@luxvt.com",
@@ -121,6 +134,7 @@ async function main() {
       subdomain: charlesLuxvtUniqueSubdomain,
       phone: "+1234567890",
       bio: "I am a real estate agent",
+      password: hashedPassword,
     },
   });
 
@@ -135,6 +149,7 @@ async function main() {
     where: { email: "eyobtadesse1997@gmail.com" },
     update: {
       subdomain: eyobTadesseUniqueSubdomain,
+      password: hashedPassword,
     },
     create: {
       email: "eyobtadesse1997@gmail.com",
@@ -142,6 +157,7 @@ async function main() {
       subdomain: eyobTadesseUniqueSubdomain,
       phone: "+1234567890",
       bio: "I am a real estate agent",
+      password: hashedPassword,
     },
   });
 
@@ -156,6 +172,7 @@ async function main() {
     where: { email: "jijo.mavila@zyxware.com" },
     update: {
       subdomain: jijoMavilaUniqueSubdomain,
+      password: hashedPassword,
     },
     create: {
       email: "jijo.mavila@zyxware.com",
@@ -163,6 +180,7 @@ async function main() {
       subdomain: jijoMavilaUniqueSubdomain,
       phone: "+1234567890",
       bio: "I am a real estate agent",
+      password: hashedPassword,
     },
   });
 
@@ -177,6 +195,7 @@ async function main() {
     where: { email: "morgan@luxvt.com" },
     update: {
       subdomain: morganUniqueSubdomain,
+      password: hashedPassword,
     },
     create: {
       email: "morgan@luxvt.com",
@@ -184,6 +203,7 @@ async function main() {
       subdomain: morganUniqueSubdomain,
       phone: "+1234567890",
       bio: "Admin",
+      password: hashedPassword,
     },
   });
 

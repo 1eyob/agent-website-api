@@ -28,6 +28,7 @@ model Agent {
   bio          String?
   phone        String?
   email        String  @unique
+  password     String? // Optional password for email/password login
   officeHours  Json?
   logo         String?
   heroImage    String?
