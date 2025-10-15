@@ -78,6 +78,7 @@ export const createAgent = async (req: Request, res: Response) => {
       bio: data.bio,
       logo: data.logo,
       heroImage: data.heroImage,
+      theme: data.theme,
       instagramUrl: data.instagramUrl,
       blogUrl: data.blogUrl,
     };
@@ -99,6 +100,7 @@ export const createAgent = async (req: Request, res: Response) => {
         officeHours: agent.officeHours,
         logo: agent.logo,
         heroImage: agent.heroImage,
+        theme: agent.theme,
         instagramUrl: agent.instagramUrl,
         blogUrl: agent.blogUrl,
         published: agent.published,
@@ -401,6 +403,7 @@ export const getAgentBySubdomain = async (req: Request, res: Response) => {
       fullName: agent?.fullName,
       profilePhoto: agent?.profilePhoto,
       bio: agent?.bio,
+      theme: agent?.theme,
       email: agent?.email,
       phone: agent?.phone,
       officeHours: agent?.officeHours,

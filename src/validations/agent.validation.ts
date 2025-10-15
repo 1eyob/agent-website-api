@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AgentPackage } from "@prisma/client";
+import { AgentPackage, Theme } from "@prisma/client";
 
 export const createAgentSchema = z.object({
   subdomain: z
@@ -14,6 +14,7 @@ export const createAgentSchema = z.object({
   profilePhoto: z.string().optional(),
   heroTitle: z.string().max(100).optional(),
   heroSubtitle: z.string().max(200).optional(),
+  theme: z.nativeEnum(Theme).optional(),
   bio: z.string().max(2000).optional(),
   title: z.string().max(100).optional(),
   package_name: z.nativeEnum(AgentPackage).optional(),

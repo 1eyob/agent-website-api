@@ -19,6 +19,11 @@ enum AgentPackage {
   CONCIERGE
 }
 
+enum Theme {
+  LIGHT
+  DARK
+}
+
 model Agent {
   id           String  @id @default(uuid())
   subdomain    String  @unique
@@ -28,13 +33,14 @@ model Agent {
   bio          String?
   phone        String?
   email        String  @unique
-  password     String? // Optional password for email/password login
+  password     String? // Optional password for email/password logins
   officeHours  Json?
   logo         String?
   heroImage    String?
   heroVideo    String?
   heroTitle    String?
   heroSubtitle String?
+  theme        Theme?  @default(LIGHT)
   instagramUrl String?
   twitterUrl   String?
   facebookUrl  String?
