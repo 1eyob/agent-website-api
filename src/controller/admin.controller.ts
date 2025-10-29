@@ -1,5 +1,6 @@
-import { Request, Response } from "express";
+import { Request, Response, RequestHandler } from "express";
 import { PrismaClient } from "@prisma/client";
+import { sendWebsiteLiveEmail } from "../utils/email";
 
 const prisma = new PrismaClient();
 
@@ -195,5 +196,57 @@ export const deleteWebsiteGenerationJob = async (
     res.status(500).json({
       error: "Failed to delete website generation job",
     });
+  }
+};
+
+// Send website live email to an agent
+export const sendWebsiteLiveEmailToAgent: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params; // agent id
+    const { websiteUrl, subject, brandName } = req.body as {
+      websiteUrl?: string;
+      subject?: string;
+      brandName?: string;
+    };
+
+    if (!websiteUrl) {
+      res.status(400).json({ error: "websiteUrl is required" });
+      return;
+    }
+
+    const agent = await prisma.agent.findUnique({
+      where: { id },
+      select: { id: true, fullName: true, email: true },
+    });
+
+    if (!agent) {
+      res.status(404).json({ error: "Agent not found" });
+      return;
+    }
+
+    if (!agent.email) {
+      res.status(400).json({ error: "Agent does not have an email" });
+      return;
+    }
+
+    const ok = await sendWebsiteLiveEmail({
+      agentName: agent.fullName,
+      agentEmail: agent.email,
+      websiteUrl,
+      brandName,
+      subject,
+    });
+
+    if (!ok) {
+      res.status(500).json({ error: "Failed to send email" });
+      return;
+    }
+
+    res.json({ success: true, message: "Email sent successfully" });
+    return;
+  } catch (error) {
+    console.error("Error sending website live email:", error);
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };

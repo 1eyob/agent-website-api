@@ -1,18 +1,32 @@
 import nodemailer from "nodemailer";
+import SMTPPool from "nodemailer/lib/smtp-pool";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
+const smtpOptions: SMTPPool.Options = {
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
+  port: Number(process.env.SMTP_PORT || 587),
+  secure: (process.env.SMTP_SECURE ?? "false") === "true", // true for 465, false for 587
+  requireTLS: (process.env.SMTP_REQUIRE_TLS ?? "true") === "true",
   auth: {
     user: process.env.EMAIL_USER || "eyobbirhanu01@gmail.com",
     pass: process.env.EMAIL_PASSWORD || "xpno crdu iqri ernm",
   },
+  pool: true,
+  maxConnections: 5,
+  maxMessages: 100,
+  connectionTimeout: 15000,
+  socketTimeout: 15000,
+  logger: process.env.NODE_ENV !== "production",
+  debug: process.env.NODE_ENV !== "production",
   tls: {
     rejectUnauthorized: false,
+    servername: process.env.SMTP_HOST || "smtp.gmail.com",
   },
-});
+};
+
+const transporter = nodemailer.createTransport(smtpOptions);
 
 export const sendOTPEmail = async (email: string, otp: string) => {
   const mailOptions = {
@@ -162,6 +176,57 @@ export const sendConciergeRequestNotification = async (requestData: any) => {
     return true;
   } catch (error) {
     console.error("Error sending concierge request notification:", error);
+    return false;
+  }
+};
+
+export const sendWebsiteLiveEmail = async (params: {
+  agentName: string;
+  agentEmail: string;
+  websiteUrl: string;
+  brandName?: string; // defaults to Exp Realty
+  subject?: string; // optional custom subject
+}) => {
+  const {
+    agentName,
+    agentEmail,
+    websiteUrl,
+    brandName = "Exp Realty",
+    subject,
+  } = params;
+
+  console.log(agentName, agentEmail, websiteUrl, brandName, subject);
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER || "eyobbirhanu01@gmail.com",
+    to: agentEmail,
+    subject: subject || "Your website is live!",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <p>Hi ${agentName},</p>
+
+        <p>Great news — your website has been generated and is live!</p>
+        <p><strong>Website URL:</strong> <a href="${websiteUrl}" target="_blank" rel="noopener noreferrer">${websiteUrl}</a></p>
+
+        <p><strong>What you can do next:</strong></p>
+        <ul>
+          <li>Click the link above to review your site</li>
+          <li>Reply with any updates you'd like us to make</li>
+          <li>Share it with your clients and network</li>
+        </ul>
+
+        <p>If you have any questions or need adjustments, just reply to this email.</p>
+
+        <p>Best regards,<br/>${brandName}</p>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error("Error sending website live email:", error);
     return false;
   }
 };

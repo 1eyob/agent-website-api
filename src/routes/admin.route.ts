@@ -4,6 +4,7 @@ import {
   getWebsiteGenerationJobById,
   updateWebsiteGenerationJobStatus,
   deleteWebsiteGenerationJob,
+  sendWebsiteLiveEmailToAgent,
 } from "../controller/admin.controller";
 import { authenticateAgent } from "../middleware/auth.middleware";
 
@@ -26,6 +27,15 @@ router.patch(
 );
 
 // Delete website generation job
-router.delete("/website-jobs/:id", deleteWebsiteGenerationJob as RequestHandler);
+router.delete(
+  "/website-jobs/:id",
+  deleteWebsiteGenerationJob as RequestHandler
+);
+
+// Send website live email to an agent
+router.post(
+  "/agents/:id/website-live-email",
+  sendWebsiteLiveEmailToAgent as RequestHandler
+);
 
 export default router;
