@@ -17,9 +17,7 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 const openai = new OpenAI({
-  apiKey:
-    process.env.OPENAI_API_KEY ||
-    "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",
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 const updateAgentSchema = createAgentSchema.partial();
