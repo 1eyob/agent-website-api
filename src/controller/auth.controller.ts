@@ -97,7 +97,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Check if email exists in AgentWebsite table
-    const agent = await prisma.agent.findUnique({
+    const agent = await prisma.agent.findFirst({
       where: { email },
     });
 
@@ -188,7 +188,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
     });
 
     // Get agent details
-    const agent = await prisma.agent.findUnique({
+    const agent = await prisma.agent.findFirst({
       where: { email },
     });
 
@@ -284,7 +284,7 @@ export const autoLogin = async (req: Request, res: Response) => {
     }
 
     // Try to find existing agent first
-    let agent = await prisma.agent.findUnique({
+    let agent = await prisma.agent.findFirst({
       where: { email: email as string },
     });
 
@@ -292,7 +292,7 @@ export const autoLogin = async (req: Request, res: Response) => {
     if (agent && !agent.entityId) {
       console.log("🔄 Updating agent with entityId:", entityid);
       agent = await prisma.agent.update({
-        where: { email: email as string },
+        where: { id: agent.id },
         data: { entityId: entityid as string },
       });
       console.log("✅ Agent updated with entityId");
@@ -328,7 +328,7 @@ export const autoLogin = async (req: Request, res: Response) => {
 
         // If email already exists, try to find by email instead
         if (createError.code === "P2002") {
-          agent = await prisma.agent.findUnique({
+          agent = await prisma.agent.findFirst({
             where: { email: email as string },
           });
 
@@ -438,7 +438,7 @@ export const passwordLogin = async (req: Request, res: Response) => {
     }
 
     // Find agent by email
-    const agent = await prisma.agent.findUnique({
+    const agent = await prisma.agent.findFirst({
       where: { email },
     });
 
