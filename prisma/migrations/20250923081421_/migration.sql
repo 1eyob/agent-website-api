@@ -5,8 +5,8 @@
   - A unique constraint covering the columns `[listingId,agentId]` on the table `LuxvtListing` will be added. If there are existing duplicate values, this will fail.
 
 */
--- DropIndex
-DROP INDEX "public"."LuxvtListing_listingId_key";
+-- DropIndex (conditional - only if exists)
+DROP INDEX IF EXISTS "public"."LuxvtListing_listingId_key";
 
 -- AlterTable
 ALTER TABLE "public"."Agent" ADD COLUMN     "agentGrade" TEXT,
