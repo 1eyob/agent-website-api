@@ -56,9 +56,8 @@ async function main() {
 
   // Create a test agent with your email
   const agent = await prisma.agent.upsert({
-    where: { email: process.env.EMAIL_USER || "eyobbirhanu28@gmail.com" },
+    where: { subdomain: uniqueSubdomain },
     update: {
-      subdomain: uniqueSubdomain, // Update subdomain if it's a new unique one
       password: hashedPassword, // Add password to existing agent
     },
     create: {
@@ -77,9 +76,8 @@ async function main() {
 
   // Create Eric's agent profile
   const ericAgent = await prisma.agent.upsert({
-    where: { email: "eric@luxvt.com" },
+    where: { subdomain: ericUniqueSubdomain },
     update: {
-      subdomain: ericUniqueSubdomain,
       password: hashedPassword,
     },
     create: {
@@ -100,9 +98,8 @@ async function main() {
 
   // Create Charles's agent profile
   const charlesAgent = await prisma.agent.upsert({
-    where: { email: "charles@airdomo.com" },
+    where: { subdomain: charlesUniqueSubdomain },
     update: {
-      subdomain: charlesUniqueSubdomain,
       password: hashedPassword,
     },
     create: {
@@ -123,9 +120,8 @@ async function main() {
 
   // Create Charles's luxvt agent profile
   const charlesLuxvtAgent = await prisma.agent.upsert({
-    where: { email: "charles@luxvt.com" },
+    where: { subdomain: charlesLuxvtUniqueSubdomain },
     update: {
-      subdomain: charlesLuxvtUniqueSubdomain,
       password: hashedPassword,
     },
     create: {
@@ -146,9 +142,8 @@ async function main() {
 
   // Create Eyob Tadesse's agent profile
   const eyobTadesseAgent = await prisma.agent.upsert({
-    where: { email: "eyobtadesse1997@gmail.com" },
+    where: { subdomain: eyobTadesseUniqueSubdomain },
     update: {
-      subdomain: eyobTadesseUniqueSubdomain,
       password: hashedPassword,
     },
     create: {
@@ -169,9 +164,8 @@ async function main() {
 
   // Create Jijo Mavila's agent profile
   const jijoMavilaAgent = await prisma.agent.upsert({
-    where: { email: "jijo.mavila@zyxware.com" },
+    where: { subdomain: jijoMavilaUniqueSubdomain },
     update: {
-      subdomain: jijoMavilaUniqueSubdomain,
       password: hashedPassword,
     },
     create: {
@@ -192,9 +186,8 @@ async function main() {
 
   // Create Morgan's agent profile
   const morganAgent = await prisma.agent.upsert({
-    where: { email: "morgan@luxvt.com" },
+    where: { subdomain: morganUniqueSubdomain },
     update: {
-      subdomain: morganUniqueSubdomain,
       password: hashedPassword,
     },
     create: {
