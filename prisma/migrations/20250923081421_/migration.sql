@@ -8,20 +8,20 @@
 -- DropIndex (conditional - only if exists)
 DROP INDEX IF EXISTS "public"."LuxvtListing_listingId_key";
 
--- AlterTable
-ALTER TABLE "public"."Agent" ADD COLUMN     "agentGrade" TEXT,
-ADD COLUMN     "brokerage" TEXT,
-ADD COLUMN     "city" TEXT,
-ADD COLUMN     "country" TEXT,
-ADD COLUMN     "isElite" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "license" TEXT,
-ADD COLUMN     "luxvtId" TEXT,
-ADD COLUMN     "state" TEXT,
-ADD COLUMN     "website" TEXT,
-ADD COLUMN     "zip" TEXT;
+-- AlterTable (add columns if they don't exist)
+ALTER TABLE "public"."Agent" ADD COLUMN IF NOT EXISTS "agentGrade" TEXT,
+ADD COLUMN IF NOT EXISTS "brokerage" TEXT,
+ADD COLUMN IF NOT EXISTS "city" TEXT,
+ADD COLUMN IF NOT EXISTS "country" TEXT,
+ADD COLUMN IF NOT EXISTS "isElite" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN IF NOT EXISTS "license" TEXT,
+ADD COLUMN IF NOT EXISTS "luxvtId" TEXT,
+ADD COLUMN IF NOT EXISTS "state" TEXT,
+ADD COLUMN IF NOT EXISTS "website" TEXT,
+ADD COLUMN IF NOT EXISTS "zip" TEXT;
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Agent_luxvtId_key" ON "public"."Agent"("luxvtId");
+CREATE UNIQUE INDEX IF NOT EXISTS "Agent_luxvtId_key" ON "public"."Agent"("luxvtId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "LuxvtListing_listingId_agentId_key" ON "public"."LuxvtListing"("listingId", "agentId");
+CREATE UNIQUE INDEX IF NOT EXISTS "LuxvtListing_listingId_agentId_key" ON "public"."LuxvtListing"("listingId", "agentId");
