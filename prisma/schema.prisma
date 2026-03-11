@@ -32,7 +32,7 @@ model Agent {
   entityId     String?
   bio          String?
   phone        String?
-  email        String  @unique
+  email        String
   password     String? // Optional password for email/password logins
   officeHours  Json?
   logo         String?
